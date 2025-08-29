@@ -1,0 +1,95 @@
+# Configuración para Technical Concept Service - DESARROLLO
+server:
+  port: 8083
+
+spring:
+  application:
+    name: technical-concept-service
+  
+  # PostgreSQL Development
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/acceso_tabasco_dev}
+    username: ${DB_USER:technical_concept_dev}
+    password: ${DB_PASSWORD:dev_password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 10000
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000
+      max-lifetime: 600000
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: America/Mexico_City
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:https://auth.nucleo.rocks/realms/nucleo-dash-realm}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:https://auth.nucleo.rocks/realms/nucleo-dash-realm/protocol/openid-connect/certs}
+
+# Eureka Client - Development
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 10
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+# Configuración específica de desarrollo
+cubs:
+  technical-concepts:
+    validation:
+      enable-area-capitulo-validation: true
+      enable-name-uniqueness-check: true
+    audit:
+      enable-change-tracking: true
+      retention-days: 365
+    security:
+      enable-area-based-access: true
+      allow-cross-area-read: false # Solo áreas pueden ver sus propios conceptos
+
+# Actuator - Development (más endpoints expuestos)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,configprops,loggers,beans
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+    env:
+      show-values: always
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+# Logging - Development (más verbose)
+logging:
+  level:
+    saf.cgmaig.technicalconcept: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.cloud.config: DEBUG

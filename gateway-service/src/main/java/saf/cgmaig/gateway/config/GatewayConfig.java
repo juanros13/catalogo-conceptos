@@ -15,13 +15,18 @@ public class GatewayConfig {
                 .route("auth-service-route", r -> r
                         .path("/auth/**")
                         .filters(f -> f.stripPrefix(1))
-                        .uri("http://localhost:8081"))
+                        .uri("lb://auth-service"))
+                
+                // Technical Concept Service Route
+                .route("technical-concept-service-route", r -> r
+                        .path("/api/general-concepts/**")
+                        .uri("lb://technical-concept-service"))
                 
                 // Generic API Route (fallback to auth service)
                 .route("api-service-route", r -> r
                         .path("/api/**")
                         .filters(f -> f.stripPrefix(1))
-                        .uri("http://localhost:8081"))
+                        .uri("lb://auth-service"))
                 
                 .build();
     }
