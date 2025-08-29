@@ -36,11 +36,8 @@ keycloak:
   credentials:
     secret: test-secret
 
-tabasco:
-  gov:
-    nomina:
-      validation:
-        required-status: ACTIVO
+# Configuration for Keycloak testing
+# No nomina validation required in new architecture
 
 logging:
   level:

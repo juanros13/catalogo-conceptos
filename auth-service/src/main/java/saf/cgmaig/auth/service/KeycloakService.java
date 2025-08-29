@@ -235,4 +235,50 @@ public class KeycloakService {
             return AuthResponse.error("Error refrescando token");
         }
     }
+
+    /**
+     * Obtener información del usuario desde el token JWT
+     */
+    public AuthResponse getUserInfoFromToken(String accessToken) {
+        logger.info("Obteniendo información del usuario desde token JWT");
+
+        try {
+            String userInfoEndpoint = String.format("%s/realms/%s/protocol/openid-connect/userinfo", keycloakUrl, realm);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(accessToken);
+
+            HttpEntity<String> request = new HttpEntity<>(headers);
+
+            ResponseEntity<Map> response = restTemplate.exchange(userInfoEndpoint, HttpMethod.GET, request, Map.class);
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                Map<String, Object> userInfo = response.getBody();
+                
+                String curp = (String) userInfo.get("preferred_username");
+                String nombreCompleto = (String) userInfo.get("name");
+                String email = (String) userInfo.get("email");
+                String dependencia = (String) userInfo.get("dependencia");
+                String puesto = (String) userInfo.get("puesto");
+
+                logger.info("Información de usuario obtenida exitosamente para CURP: {}", curp);
+
+                AuthResponse.UserInfo userInfoDto = new AuthResponse.UserInfo(
+                    curp, nombreCompleto, email, dependencia, puesto);
+
+                AuthResponse authResponse = AuthResponse.success("Perfil obtenido exitosamente");
+                authResponse.setUserInfo(userInfoDto);
+
+                return authResponse;
+
+            } else {
+                logger.warn("Error obteniendo información de usuario desde token, status: {}", response.getStatusCode());
+                return AuthResponse.error("Error obteniendo información de usuario");
+            }
+
+        } catch (Exception e) {
+            logger.error("Error obteniendo información de usuario desde token", e);
+            return AuthResponse.error("Error obteniendo información de usuario");
+        }
+    }
 }
