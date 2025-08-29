@@ -1,0 +1,100 @@
+# Gateway Service - Configuración de Producción
+server:
+  port: 8080
+
+
+# Configuración de Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+# Configuración de Keycloak para producción
+keycloak:
+  realm: ${KEYCLOAK_REALM:acceso-tabasco}
+  auth-server-url: ${KEYCLOAK_URL:https://keycloak.tabasco.gob.mx/}
+  ssl-required: external
+  resource: ${KEYCLOAK_CLIENT_ID:gateway-client-prod}
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET}
+  use-resource-role-mappings: true
+  bearer-only: true
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOriginPatterns: 
+                  - "https://*.tabasco.gob.mx"
+                  - "https://acceso.tabasco.gob.mx"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders: "*"
+                allowCredentials: true
+                maxAge: 3600
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Configuración para Keycloak en producción
+          issuer-uri: ${keycloak.auth-server-url}realms/${keycloak.realm}
+          jwk-set-uri: ${keycloak.auth-server-url}realms/${keycloak.realm}/protocol/openid-connect/certs
+
+# Actuator endpoints para producción (restringidos)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Logging optimizado para producción
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    org.springframework.security: WARN
+    org.springframework.web.reactive: WARN
+    saf.cgmaig: INFO
+    root: WARN
+
+# Gateway specific configuration para producción
+app:
+  gateway:
+    allowed-origins:
+      - https://acceso.tabasco.gob.mx
+      - https://portal.tabasco.gob.mx
+      - https://admin.tabasco.gob.mx
+    security:
+      public-paths:
+        - /actuator/health
+        - /actuator/info
+        - /auth/login
+        - /auth/validate
+      rate-limit:
+        enabled: true
+        requests-per-second: 100
+        burst-capacity: 200
+    timeout:
+      connect-timeout: 5000
+      response-timeout: 30000

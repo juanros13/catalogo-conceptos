@@ -1,0 +1,51 @@
+# Discovery Service - Production Configuration
+server:
+  port: 8761
+
+spring:
+  application:
+    name: discovery-service
+
+eureka:
+  instance:
+    hostname: ${EUREKA_HOSTNAME:discovery-service}
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      default-zone: http://${EUREKA_HOSTNAME:discovery-service}:8761/eureka/
+  server:
+    enable-self-preservation: true
+    eviction-interval-timer-in-ms: 30000
+    expected-client-renewal-interval-seconds: 10
+    renewal-percent-threshold: 0.85
+
+# Security Configuration
+security:
+  require-ssl: false
+  
+# Management and Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+  security:
+    enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    com.netflix.eureka: WARN
+    com.netflix.discovery: WARN
+    org.springframework.cloud: WARN
+    root: WARN

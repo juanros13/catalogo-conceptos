@@ -1,0 +1,94 @@
+services:
+  # Config Server - Debe iniciar primero
+  config-server:
+    build:
+      context: .
+      dockerfile: config-server/Dockerfile
+    container_name: acceso-config
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_PROFILES_ACTIVE=native
+    env_file:
+      - .env
+    networks:
+      - acceso-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8888/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Discovery Service (Eureka) - Ahora depende del config-server
+  discovery-service:
+    build:
+      context: .
+      dockerfile: discovery-service/Dockerfile
+    container_name: acceso-discovery
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+    networks:
+      - acceso-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # Gateway Service - Inicia después del discovery-service
+  gateway-service:
+    build:
+      context: .
+      dockerfile: gateway-service/Dockerfile
+    container_name: acceso-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+    env_file:
+      - .env
+    networks:
+      - acceso-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # Auth Service - Opcional para completar la arquitectura
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    container_name: acceso-auth
+    ports:
+      - "8081:8081"
+    depends_on:
+      - discovery-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+    env_file:
+      - .env
+    networks:
+      - acceso-network
+    profiles:
+      - full  # Solo se inicia con perfil 'full'
+
+
+networks:
+  acceso-network:
+    driver: bridge

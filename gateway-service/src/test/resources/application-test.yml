@@ -1,0 +1,15 @@
+server:
+  port: 0
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/test-realm
+          jwk-set-uri: http://localhost:8180/realms/test-realm/protocol/openid-connect/certs
+
+logging:
+  level:
+    root: WARN
+    org.springframework: INFO

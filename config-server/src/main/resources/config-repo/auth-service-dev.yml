@@ -1,0 +1,117 @@
+# Configuración para Auth Service - DESARROLLO
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  
+  # PostgreSQL Development
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/acceso_tabasco_dev}
+    username: ${DB_USER:auth_dev}
+    password: ${DB_PASSWORD:dev_password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 10000
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000
+      max-lifetime: 600000
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: America/Mexico_City
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:https://auth.nucleo.rocks/realms/nucleo-dash-realm}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:https://auth.nucleo.rocks/realms/nucleo-dash-realm/protocol/openid-connect/certs}
+
+# Eureka Client - Development
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 10
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+# Keycloak Development
+keycloak:
+  url: ${KEYCLOAK_URL:https://auth.nucleo.rocks/}
+  realm: ${KEYCLOAK_REALM:nucleo-dash-realm}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET}
+  client-id: ${KEYCLOAK_CLIENT_ID:nucleo-dash-back-client}
+  auth-server-url: ${KEYCLOAK_URL:https://auth.nucleo.rocks}
+  resource: ${KEYCLOAK_CLIENT_ID:nucleo-dash-back-client}
+  public-client: false
+  verify-token-audience: true
+  use-resource-role-mappings: true
+  confidential-port: 0
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET}
+
+# Configuración específica de desarrollo
+tabasco:
+  gov:
+    sistema:
+      nombre: "Sistema de Acceso Unificado"
+      version: "1.0.0"
+      descripcion: "Servicio de Autenticación para el Gobierno de Tabasco"
+    dependencia:
+      responsable: "CGMAIG"
+      contacto: "soporte-acceso@tabasco.gob.mx"
+    nomina:
+      validation:
+        required-status: ACTIVO
+        cache-duration: PT5M # Cache corto para desarrollo
+      view:
+        name: vw_empleados_nomina
+    security:
+      session-timeout: 7200 # 2 horas para desarrollo
+      max-login-attempts: 10 # Más intentos en dev
+
+# Actuator - Development (más endpoints expuestos)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,configprops,loggers,beans
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+    env:
+      show-values: always
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+# Logging - Development (más verbose)
+logging:
+  level:
+    saf.cgmaig.auth: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.cloud.config: DEBUG

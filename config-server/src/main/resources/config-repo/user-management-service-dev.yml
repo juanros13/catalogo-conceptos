@@ -1,0 +1,129 @@
+# Configuración para User Management Service - DESARROLLO
+server:
+  port: 8082
+
+spring:
+  application:
+    name: user-management-service
+  
+  # PostgreSQL Development
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/acceso_tabasco_dev}
+    username: ${DB_USER:user_mgmt_dev}
+    password: ${DB_PASSWORD:dev_password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 10000
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000
+      max-lifetime: 600000
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: America/Mexico_City
+
+  # Liquibase para migraciones
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/acceso-tabasco}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8180/realms/acceso-tabasco/protocol/openid-connect/certs}
+
+# Eureka Client - Development
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 10
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+# Keycloak Development
+keycloak:
+  realm: acceso-tabasco
+  auth-server-url: ${KEYCLOAK_URL:http://localhost:8180}
+  resource: user-management-client
+  public-client: false
+  verify-token-audience: true
+  use-resource-role-mappings: true
+  confidential-port: 0
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET:dev-user-mgmt-secret}
+
+# Configuración específica de desarrollo
+tabasco:
+  gov:
+    sistema:
+      nombre: "Sistema de Gestión de Usuarios"
+      version: "1.0.0"
+      descripcion: "Servicio de Gestión de Usuarios para el Gobierno de Tabasco"
+    dependencia:
+      responsable: "CGMAIG"
+      contacto: "soporte-usuarios@tabasco.gob.mx"
+    user-management:
+      default-role: "USER_BASIC"
+      auto-create-profiles: true
+      sync-with-nomina: true
+      password-policy:
+        min-length: 8
+        require-uppercase: true
+        require-lowercase: true
+        require-numbers: true
+        require-special-chars: false
+      session:
+        timeout: 7200 # 2 horas para desarrollo
+        max-concurrent-sessions: 5
+
+# Actuator - Development (más endpoints expuestos)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,configprops,loggers,beans,liquibase
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+    env:
+      show-values: always
+    liquibase:
+      enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+# Logging - Development (más verbose)
+logging:
+  level:
+    saf.cgmaig.usermanagement: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.cloud.config: DEBUG
+    liquibase: DEBUG
+    root: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{36}:%line] - %msg%n"
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

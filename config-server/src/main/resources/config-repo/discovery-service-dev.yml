@@ -1,0 +1,50 @@
+# Discovery Service - Development Configuration
+server:
+  port: 8761
+
+spring:
+  application:
+    name: discovery-service
+
+eureka:
+  instance:
+    hostname: localhost
+    prefer-ip-address: false
+    # Configuración más agresiva para evitar heartbeats
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+  client:
+    # Configuración de servidor Eureka (no se registra como cliente)
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  server:
+    # Configuración del servidor Eureka
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 5000
+    expected-client-renewal-interval-seconds: 30
+    wait-time-in-ms-when-sync-empty: 0
+    # Configuración adicional para evitar problemas de cliente
+    renewal-percent-threshold: 0.85
+
+# Management and Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    com.netflix.eureka: INFO
+    com.netflix.discovery: WARN
+    org.springframework.cloud: INFO
+    root: INFO

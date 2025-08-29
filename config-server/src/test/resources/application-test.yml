@@ -1,0 +1,22 @@
+server:
+  port: 0
+
+spring:
+  profiles:
+    active: native
+  
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/test-config/
+
+security:
+  user:
+    name: test-user
+    password: test-password
+
+logging:
+  level:
+    root: WARN
+    org.springframework: INFO

@@ -1,0 +1,60 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config-repo/
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    org.springframework.cloud.config: INFO
+    root: INFO
+
+---
+# Configuración para DESARROLLO
+spring:
+  config:
+    activate:
+      on-profile: dev
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config-repo/
+
+---
+# Configuración para PRODUCCIÓN
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/tabasco-gov/acceso-tabasco-config
+          clone-on-start: true
+          default-label: main
+          access-token: ${GIT_ACCESS_TOKEN:ghp_your_github_personal_access_token}
+          timeout: 10

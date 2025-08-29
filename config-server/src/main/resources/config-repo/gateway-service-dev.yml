@@ -1,0 +1,93 @@
+# Gateway Service - Configuración de Desarrollo
+server:
+  port: 8080
+
+
+# Configuración de Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+# Configuración de Keycloak para desarrollo (usando nucleo.rocks)
+keycloak:
+  realm: ${KEYCLOAK_REALM:nucleo-dash-realm}
+  auth-server-url: ${KEYCLOAK_URL:https://auth.nucleo.rocks/}
+  ssl-required: external
+  resource: ${KEYCLOAK_CLIENT_ID:nucleo-dash-back-client}
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET:od5xYtQfHjRM5VUvSvBZkmiHZfhKCRQW}
+  use-resource-role-mappings: true
+  bearer-only: true
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOriginPatterns: "*"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders: "*"
+                allowCredentials: true
+                maxAge: 3600
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Configuración para Keycloak nucleo.rocks en desarrollo
+          issuer-uri: ${keycloak.auth-server-url}realms/${keycloak.realm}
+          jwk-set-uri: ${keycloak.auth-server-url}realms/${keycloak.realm}/protocol/openid-connect/certs
+
+# Actuator endpoints para desarrollo
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging detallado para desarrollo
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.reactive: DEBUG
+    saf.cgmaig: DEBUG
+
+
+# Gateway specific configuration para desarrollo
+app:
+  gateway:
+    allowed-origins:
+      - http://localhost:3000
+      - http://localhost:4200
+      - http://localhost:5173
+    security:
+      public-paths:
+        - /actuator/**
+        - /public/**
+        - /auth/login
+        - /auth/register
+        - /swagger-ui/**
+        - /v3/api-docs/**
