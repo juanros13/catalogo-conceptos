@@ -35,7 +35,7 @@ public class TechnicalConcept {
     @NotNull(message = "Capítulo es obligatorio")
     private Integer capitulo;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "concept_partidas", joinColumns = @JoinColumn(name = "concept_id"))
     @Column(name = "partida")
     private List<String> partidasPermitidas;
@@ -63,10 +63,10 @@ public class TechnicalConcept {
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
 
-    @Column(name = "creado_por", length = 18)
+    @Column(name = "creado_por", length = 100)
     private String creadoPor;
 
-    @Column(name = "actualizado_por", length = 18)
+    @Column(name = "actualizado_por", length = 100)
     private String actualizadoPor;
 
     @Column(name = "motivo_cambio", length = 500)

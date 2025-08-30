@@ -9,8 +9,8 @@ spring:
   # PostgreSQL Development
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/acceso_tabasco_dev}
-    username: ${DB_USER:technical_concept_dev}
-    password: ${DB_PASSWORD:dev_password}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:activo}
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 10000

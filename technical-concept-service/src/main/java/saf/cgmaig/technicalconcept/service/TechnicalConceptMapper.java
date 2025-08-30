@@ -7,11 +7,13 @@ import org.mapstruct.Named;
 import saf.cgmaig.technicalconcept.dto.TechnicalConceptCreateRequest;
 import saf.cgmaig.technicalconcept.dto.TechnicalConceptResponse;
 import saf.cgmaig.technicalconcept.dto.TechnicalConceptUpdateRequest;
+import saf.cgmaig.technicalconcept.entity.AreaFacultada;
+import saf.cgmaig.technicalconcept.entity.ConceptStatus;
 import saf.cgmaig.technicalconcept.entity.TechnicalConcept;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+//@Mapper(componentModel = "spring")
 public interface TechnicalConceptMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -25,9 +27,19 @@ public interface TechnicalConceptMapper {
     @Mapping(target = "motivoCambio", source = "request.motivoCreacion")
     TechnicalConcept toEntity(TechnicalConceptCreateRequest request, String userCurp);
 
-    @Mapping(target = "areaFacultadaDescripcion", source = "areaFacultada.descripcion")
-    @Mapping(target = "estadoDescripcion", source = "estado.descripcion")
+    @Mapping(target = "areaFacultadaDescripcion", source = "areaFacultada", qualifiedByName = "areaToDescription")
+    @Mapping(target = "estadoDescripcion", source = "estado", qualifiedByName = "statusToDescription")
     TechnicalConceptResponse toResponse(TechnicalConcept entity);
+
+    @Named("areaToDescription")
+    default String areaToDescription(AreaFacultada area) {
+        return area != null ? area.getDescripcion() : null;
+    }
+
+    @Named("statusToDescription")
+    default String statusToDescription(ConceptStatus status) {
+        return status != null ? status.getDescripcion() : null;
+    }
 
     List<TechnicalConceptResponse> toResponseList(List<TechnicalConcept> entities);
 

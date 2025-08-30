@@ -22,7 +22,7 @@ keycloak:
   ssl-required: external
   resource: ${KEYCLOAK_CLIENT_ID:gateway-client-prod}
   credentials:
-    secret: ${KEYCLOAK_CLIENT_SECRET}
+    secret: ${KEYCLOAK_CLIENT_SECRET:od5xYtQfHjRM5VUvSvBZkmiHZfhKCRQW}
   use-resource-role-mappings: true
   bearer-only: true
 

@@ -53,17 +53,7 @@ public class AuthController {
     /**
      * Validar CURP en nómina (endpoint público)
      */
-    @GetMapping("/validate-curp/{curp}")
-    public ResponseEntity<AuthResponse> validateCurp(
-            @PathVariable @NotBlank(message = "CURP es requerido") String curp) {
-        
-        logger.info("Validando CURP en nómina: {}", curp);
-        
-        AuthResponse response = authService.validateCurp(curp.toUpperCase());
-        
-        HttpStatus status = response.isSuccess() ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-        return ResponseEntity.status(status).body(response);
-    }
+//   z
 
     /**
      * Obtener perfil del usuario autenticado
@@ -73,26 +63,32 @@ public class AuthController {
         logger.info("Solicitud de perfil de usuario autenticado");
         
         try {
-            // Extraer CURP del JWT
+            // Extraer información directamente del JWT sin llamar a Keycloak
             Jwt jwt = (Jwt) authentication.getPrincipal();
-            String curp = jwt.getClaimAsString("preferred_username");
             
-            if (curp == null) {
-                curp = jwt.getClaimAsString("sub");
-            }
+            String email = jwt.getClaimAsString("email");
+            String username = jwt.getClaimAsString("preferred_username");
+            String name = jwt.getClaimAsString("name");
+            String givenName = jwt.getClaimAsString("given_name");
+            String familyName = jwt.getClaimAsString("family_name");
             
-            if (curp == null) {
-                logger.warn("No se pudo extraer CURP del token JWT");
-                return ResponseEntity.badRequest()
-                    .body(AuthResponse.error("Token inválido: no contiene información de usuario"));
-            }
+            // Construir información del usuario desde el token
+            AuthResponse.UserInfo userInfo = new AuthResponse.UserInfo();
+            userInfo.setEmail(email);
+            userInfo.setCurp(username); // preferred_username es el email en este caso
+            userInfo.setNombreCompleto(name != null ? name : (givenName + " " + familyName));
+            
+            // Extraer dependencia y puesto si están en custom claims
+            String dependencia = jwt.getClaimAsString("dependencia");
+            String puesto = jwt.getClaimAsString("puesto");
+            userInfo.setDependencia(dependencia);
+            userInfo.setPuesto(puesto);
 
-            logger.info("Obteniendo perfil para CURP extraído del token: {}", curp);
+            AuthResponse response = AuthResponse.success("Perfil obtenido exitosamente");
+            response.setUserInfo(userInfo);
             
-            AuthResponse response = authService.getUserProfile(curp);
-            
-            HttpStatus status = response.isSuccess() ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-            return ResponseEntity.status(status).body(response);
+            logger.info("Perfil obtenido exitosamente para usuario: {}", email);
+            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             logger.error("Error obteniendo perfil de usuario", e);
@@ -136,20 +132,32 @@ public class AuthController {
             // Si llegamos aquí, el token ya fue validado por Spring Security
             Jwt jwt = (Jwt) authentication.getPrincipal();
             
-            // Extraer información adicional del token
-            String curp = jwt.getClaimAsString("preferred_username");
+            // Extraer información básica del token
+            String email = jwt.getClaimAsString("email");
+            String username = jwt.getClaimAsString("preferred_username");
             String name = jwt.getClaimAsString("name");
+            
+            // Verificar expiración
+            java.time.Instant expiresAt = jwt.getExpiresAt();
+            boolean isExpired = expiresAt != null && expiresAt.isBefore(java.time.Instant.now());
+            
+            if (isExpired) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(AuthResponse.error("Token expirado"));
+            }
             
             AuthResponse response = AuthResponse.success("Token válido");
             
-            // Agregar información básica del token si está disponible
-            if (curp != null || name != null) {
+            // Agregar información del usuario desde el token
+            if (email != null || name != null) {
                 AuthResponse.UserInfo userInfo = new AuthResponse.UserInfo();
-                userInfo.setCurp(curp);
+                userInfo.setEmail(email);
+                userInfo.setCurp(username);
                 userInfo.setNombreCompleto(name);
                 response.setUserInfo(userInfo);
             }
             
+            logger.info("Token validado exitosamente para usuario: {}", email);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {

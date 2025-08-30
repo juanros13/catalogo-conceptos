@@ -11,11 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 /**
  * Configuración de seguridad para el Auth Service.
  * 
- * Configura la validación de tokens JWT provenientes del Gateway:
- * - Valida tokens JWT firmados por Keycloak
- * - Extrae roles y authorities del token
- * - Permite endpoints públicos (/auth/login, /actuator/health)
- * - Requiere autenticación para endpoints privados
+ * Configura endpoints públicos y privados con validación JWT.
  */
 @Configuration
 @EnableWebSecurity
@@ -28,30 +24,31 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 // Endpoints públicos
-                .requestMatchers("/auth/login").permitAll()
-                .requestMatchers("/auth/validate-curp").permitAll()
-                .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers("/actuator/info").permitAll()
+                .requestMatchers("/auth/login", "/auth/health", "/auth/info").permitAll()
+                .requestMatchers("/actuator/**").permitAll()
                 // Endpoints que requieren autenticación
-                .requestMatchers("/auth/profile").authenticated()
-                .requestMatchers("/auth/logout").authenticated()
-                .requestMatchers("/auth/validate-token").authenticated()
-                // Todos los demás endpoints requieren autenticación
-                .anyRequest().authenticated()
+                .requestMatchers("/auth/profile", "/auth/logout", "/auth/validate-token").authenticated()
+                // Permitir otros endpoints por ahora
+                .anyRequest().permitAll()
             )
-            // Configuración OAuth2 Resource Server para validar JWT
+            // Configurar OAuth2 Resource Server solo para endpoints autenticados
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt
                     .jwtAuthenticationConverter(jwtAuthenticationConverter())
                 )
+                // Manejo personalizado de errores de autenticación
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(401);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"success\":false,\"message\":\"Token requerido o inválido\"}");
+                })
             );
 
         return http.build();
     }
 
     /**
-     * Convierte el JWT en authorities de Spring Security.
-     * Extrae los roles de Keycloak del claim 'realm_access.roles'
+     * Configura el convertidor JWT para extraer información del token
      */
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {

@@ -7,14 +7,13 @@ import jakarta.validation.constraints.Size;
  * DTO para solicitudes de login al sistema de acceso del Gobierno de Tabasco.
  * 
  * Campos:
- * - curp: CURP del empleado (se validará en nómina)
+ * - email: Email del usuario para autenticación en Keycloak
  * - password: Password del usuario en Keycloak
  */
 public class LoginRequest {
 
-    @NotBlank(message = "CURP es requerido")
-    @Size(min = 18, max = 18, message = "CURP debe tener exactamente 18 caracteres")
-    private String curp;
+    @NotBlank(message = "Email es requerido")
+    private String email;
 
     @NotBlank(message = "Password es requerido")
     @Size(min = 6, message = "Password debe tener al menos 6 caracteres")
@@ -23,18 +22,27 @@ public class LoginRequest {
     // Constructors
     public LoginRequest() {}
 
-    public LoginRequest(String curp, String password) {
-        this.curp = curp;
+    public LoginRequest(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
     // Getters and Setters
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    // Compatibility method for existing code
     public String getCurp() {
-        return curp;
+        return email;
     }
 
     public void setCurp(String curp) {
-        this.curp = curp != null ? curp.toUpperCase() : null;
+        this.email = curp;
     }
 
     public String getPassword() {
@@ -48,7 +56,7 @@ public class LoginRequest {
     @Override
     public String toString() {
         return "LoginRequest{" +
-                "curp='" + curp + '\'' +
+                "email='" + email + '\'' +
                 ", password='[PROTECTED]'" +
                 '}';
     }

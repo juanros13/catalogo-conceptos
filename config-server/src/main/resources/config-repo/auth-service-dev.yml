@@ -9,8 +9,8 @@ spring:
   # PostgreSQL Development
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/acceso_tabasco_dev}
-    username: ${DB_USER:auth_dev}
-    password: ${DB_PASSWORD:dev_password}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:activo}
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 10000
@@ -37,6 +37,8 @@ spring:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI:https://auth.nucleo.rocks/realms/nucleo-dash-realm}
           jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:https://auth.nucleo.rocks/realms/nucleo-dash-realm/protocol/openid-connect/certs}
+          # Configuración para evitar validación automática al startup
+          cache-duration: PT5M
 
 # Eureka Client - Development
 eureka:
@@ -56,7 +58,7 @@ eureka:
 keycloak:
   url: ${KEYCLOAK_URL:https://auth.nucleo.rocks/}
   realm: ${KEYCLOAK_REALM:nucleo-dash-realm}
-  client-secret: ${KEYCLOAK_CLIENT_SECRET}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:od5xYtQfHjRM5VUvSvBZkmiHZfhKCRQW}
   client-id: ${KEYCLOAK_CLIENT_ID:nucleo-dash-back-client}
   auth-server-url: ${KEYCLOAK_URL:https://auth.nucleo.rocks}
   resource: ${KEYCLOAK_CLIENT_ID:nucleo-dash-back-client}
@@ -65,7 +67,7 @@ keycloak:
   use-resource-role-mappings: true
   confidential-port: 0
   credentials:
-    secret: ${KEYCLOAK_CLIENT_SECRET}
+    secret: ${KEYCLOAK_CLIENT_SECRET:od5xYtQfHjRM5VUvSvBZkmiHZfhKCRQW}
 
 # Configuración específica de desarrollo
 tabasco:

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional
+@Transactional("transactionManager")
 public class TechnicalConceptService {
 
     private static final Logger logger = LoggerFactory.getLogger(TechnicalConceptService.class);
@@ -143,7 +143,7 @@ public class TechnicalConceptService {
     /**
      * Obtener conceptos activos para capturistas
      */
-    @Transactional(readOnly = true)
+    @Transactional(value = "transactionManager", readOnly = true)
     public List<TechnicalConceptResponse> getActiveConceptsForCapture() {
         logger.debug("Obteniendo conceptos activos para captura");
         
@@ -154,7 +154,7 @@ public class TechnicalConceptService {
     /**
      * Obtener conceptos activos por capítulo para capturistas
      */
-    @Transactional(readOnly = true)
+    @Transactional(value = "transactionManager", readOnly = true)
     public List<TechnicalConceptResponse> getActiveConceptsByCapitulo(Integer capitulo) {
         logger.debug("Obteniendo conceptos activos para captura del capítulo: {}", capitulo);
         
@@ -166,7 +166,7 @@ public class TechnicalConceptService {
     /**
      * Obtener conceptos por área facultada (para gestión)
      */
-    @Transactional(readOnly = true)
+    @Transactional(value = "transactionManager", readOnly = true)
     public Page<TechnicalConceptResponse> getConceptsByArea(AreaFacultada area, Pageable pageable) {
         logger.debug("Obteniendo conceptos del área: {}", area);
         
@@ -177,7 +177,7 @@ public class TechnicalConceptService {
     /**
      * Búsqueda avanzada con filtros
      */
-    @Transactional(readOnly = true)
+    @Transactional(value = "transactionManager", readOnly = true)
     public Page<TechnicalConceptResponse> searchConcepts(Integer capitulo, AreaFacultada areaFacultada,
                                                        ConceptStatus estado, Boolean activo, 
                                                        String searchTerm, Pageable pageable) {
@@ -192,7 +192,7 @@ public class TechnicalConceptService {
     /**
      * Obtener concepto por ID
      */
-    @Transactional(readOnly = true)
+    @Transactional(value = "transactionManager", readOnly = true)
     public TechnicalConceptResponse getById(UUID id) {
         TechnicalConcept concept = findConceptById(id);
         return mapper.toResponse(concept);

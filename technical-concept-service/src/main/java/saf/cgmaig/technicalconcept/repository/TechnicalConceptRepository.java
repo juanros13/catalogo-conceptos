@@ -63,9 +63,9 @@ public interface TechnicalConceptRepository extends JpaRepository<TechnicalConce
 
     // Para auditoría - conceptos modificados recientemente
     @Query("SELECT tc FROM TechnicalConcept tc WHERE " +
-           "tc.fechaActualizacion >= CURRENT_DATE - :days " +
+           "tc.fechaActualizacion >= :cutoffDate " +
            "ORDER BY tc.fechaActualizacion DESC")
-    List<TechnicalConcept> findRecentlyModified(@Param("days") int days);
+    List<TechnicalConcept> findRecentlyModified(@Param("cutoffDate") java.time.LocalDateTime cutoffDate);
 
     // Validaciones de negocio
     @Query("SELECT COUNT(tc) > 0 FROM TechnicalConcept tc WHERE " +

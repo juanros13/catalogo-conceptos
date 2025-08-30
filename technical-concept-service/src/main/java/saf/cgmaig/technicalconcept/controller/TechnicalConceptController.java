@@ -214,13 +214,13 @@ public class TechnicalConceptController {
             @SuppressWarnings("unchecked")
             var roles = (List<String>) realmAccess.get("roles");
             
-            if (roles.contains("ValidadorTecnico_CGRM")) {
+            if (roles.contains("VALIDADOR_TECNICO_CGRM")) {
                 return AreaFacultada.CGRM;
-            } else if (roles.contains("ValidadorTecnico_CGSG")) {
+            } else if (roles.contains("VALIDADOR_TECNICO_CGSG")) {
                 return AreaFacultada.CGSG;
-            } else if (roles.contains("ValidadorTecnico_CGMAIG")) {
+            } else if (roles.contains("VALIDADOR_TECNICO_CGMAIG")) {
                 return AreaFacultada.CGMAIG;
-            } else if (roles.contains("ValidadorTecnico_Patrimonio")) {
+            } else if (roles.contains("VALIDADOR_TECNICO_PATRIMONIO")) {
                 return AreaFacultada.PATRIMONIO;
             }
         }
@@ -260,5 +260,21 @@ public class TechnicalConceptController {
     public ResponseEntity<String> handleIllegalState(IllegalStateException e) {
         logger.warn("Error de estado: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationException(org.springframework.web.bind.MethodArgumentNotValidException e) {
+        logger.warn("Error de validación: {}", e.getMessage());
+        String errorMessage = e.getBindingResult().getFieldErrors().stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .reduce((a, b) -> a + "; " + b)
+            .orElse("Error de validación");
+        return ResponseEntity.badRequest().body(errorMessage);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGenericException(Exception e) {
+        logger.error("Error inesperado: {}", e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor: " + e.getMessage());
     }
 }
