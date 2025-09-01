@@ -3,6 +3,9 @@ package saf.cgmaig.validation.model;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.DecimalMin;
+
+import java.math.BigDecimal;
 
 /**
  * Request para validación de conceptos técnicos
@@ -39,12 +42,17 @@ public class ValidationRequest {
     // ID del concepto (null para creación, presente para actualización)
     private Long conceptId;
 
+    // Valor estimado del concepto (para validaciones de límites monetarios)
+    @DecimalMin(value = "0.0", inclusive = false, message = "El valor estimado debe ser mayor a cero")
+    private BigDecimal estimatedValue;
+
     // Constructor por defecto
     public ValidationRequest() {}
 
     // Constructor completo
     public ValidationRequest(String name, String area, String chapter, String description, 
-                           String unitMeasure, String specifications, String createdBy, Long conceptId) {
+                           String unitMeasure, String specifications, String createdBy, 
+                           Long conceptId, BigDecimal estimatedValue) {
         this.name = name;
         this.area = area;
         this.chapter = chapter;
@@ -53,6 +61,7 @@ public class ValidationRequest {
         this.specifications = specifications;
         this.createdBy = createdBy;
         this.conceptId = conceptId;
+        this.estimatedValue = estimatedValue;
     }
 
     // Getters y Setters
@@ -120,6 +129,14 @@ public class ValidationRequest {
         this.conceptId = conceptId;
     }
 
+    public BigDecimal getEstimatedValue() {
+        return estimatedValue;
+    }
+
+    public void setEstimatedValue(BigDecimal estimatedValue) {
+        this.estimatedValue = estimatedValue;
+    }
+
     @Override
     public String toString() {
         return "ValidationRequest{" +
@@ -131,6 +148,7 @@ public class ValidationRequest {
                 ", specifications='" + specifications + '\'' +
                 ", createdBy='" + createdBy + '\'' +
                 ", conceptId=" + conceptId +
+                ", estimatedValue=" + estimatedValue +
                 '}';
     }
 }

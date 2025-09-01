@@ -56,6 +56,10 @@ eureka:
 # Configuración específica de Validation Service
 cubs:
   validation:
+    # Configuración de templates por capítulo
+    templates:
+      enabled: true
+      config-file: "classpath:config-repo/chapter-templates.yml"
     # Configuración de validadores
     uniqueness:
       enabled: true
@@ -73,8 +77,15 @@ cubs:
       allowed-unit-measures: ["PIEZA", "METRO", "KILOGRAMO", "LITRO", "SERVICIO", "LOTE", "M2", "M3"]
     business-rules:
       enabled: true
-      require-specifications: true
-      validate-technical-words: true
+      high-value-threshold: 100000.00
+      restricted-hours-enabled: false
+      work-start-hour: 8
+      work-end-hour: 18
+    # Configuración del servicio principal
+    service:
+      enabled: true
+      parallel-execution: false
+      stop-on-first-error: false
     # Configuración de auditoría
     audit:
       enabled: true

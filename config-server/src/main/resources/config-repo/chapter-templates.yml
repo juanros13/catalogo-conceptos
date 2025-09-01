@@ -1,0 +1,148 @@
+# Definición de Templates por Capítulo CUBS
+# Estructura dinámica y consumible para diferentes capítulos
+
+chapter_templates:
+  
+  # CAPÍTULO 2000 - MATERIALES EN GENERAL
+  "2000_MATERIALES":
+    name: "Materiales en General"
+    description: "Template para conceptos de materiales y productos físicos"
+    required_fields: 4
+    fields:
+      - field_key: "general"
+        field_name: "GENERAL"
+        field_type: "textarea"
+        required: true
+        max_length: 500
+        placeholder: "Descripción general del material"
+        validation_rules: ["not_empty", "min_length:10"]
+        
+      - field_key: "especifica"
+        field_name: "ESPECÍFICA"
+        field_type: "textarea"
+        required: true
+        max_length: 1000
+        placeholder: "Especificación técnica detallada"
+        validation_rules: ["not_empty", "technical_terms"]
+        
+      - field_key: "presentacion_producto"
+        field_name: "PRESENTACIÓN DEL PRODUCTO"
+        field_type: "text"
+        required: true
+        max_length: 200
+        placeholder: "Ej: Caja x 100 unidades, Bolsa de 5kg"
+        validation_rules: ["not_empty", "presentation_format"]
+        
+      - field_key: "composicion_materiales"
+        field_name: "COMPOSICIÓN / MAT EN QUE ESTÁ FABRICADO/MEDIDAS O DIMENSIONES"
+        field_type: "textarea"
+        required: true
+        max_length: 800
+        placeholder: "Material de fabricación, dimensiones, peso, etc."
+        validation_rules: ["not_empty", "dimensions_format"]
+
+  # CAPÍTULO 2000 - SERVICIOS GENERAL
+  "2000_SERVICIOS":
+    name: "Servicios en General"
+    description: "Template para conceptos de servicios"
+    required_fields: 4
+    fields:
+      - field_key: "general"
+        field_name: "GENERAL"
+        field_type: "textarea"
+        required: true
+        max_length: 500
+        placeholder: "Descripción general del servicio"
+        validation_rules: ["not_empty", "min_length:10"]
+        
+      - field_key: "descripcion_tecnica"
+        field_name: "DESCRIPCIÓN TÉCNICA DEL SERVICIO REQUERIDO"
+        field_type: "textarea"
+        required: true
+        max_length: 1500
+        placeholder: "Especificación técnica detallada del servicio"
+        validation_rules: ["not_empty", "service_technical_terms"]
+        
+      - field_key: "componentes_servicio"
+        field_name: "COMPONENTES DEL SERVICIO"
+        field_type: "textarea"
+        required: true
+        max_length: 800
+        placeholder: "Lista de componentes que conforman el servicio"
+        validation_rules: ["not_empty", "components_list"]
+        
+      - field_key: "accesorios_servicio"
+        field_name: "ACCESORIOS DEL SERVICIO (INCLUYE: ELEMENTOS HUMANOS, MATERIALES, EQUIPOS E INSUMOS, SOFTWARE)"
+        field_type: "textarea"
+        required: true
+        max_length: 1000
+        placeholder: "Personal necesario, materiales, equipos, software requerido"
+        validation_rules: ["not_empty", "accessories_format"]
+
+  # CAPÍTULO 5000
+  "5000":
+    name: "Productos Especializados"
+    description: "Template para productos especializados con características específicas"
+    required_fields: 5
+    fields:
+      - field_key: "general"
+        field_name: "GENERAL"
+        field_type: "textarea"
+        required: true
+        max_length: 500
+        placeholder: "Descripción general del producto"
+        validation_rules: ["not_empty", "min_length:10"]
+        
+      - field_key: "caracteristica_funcionalidad"
+        field_name: "CARACTERÍSTICA DE FUNCIONALIDAD"
+        field_type: "textarea"
+        required: true
+        max_length: 800
+        placeholder: "Funcionalidad principal y características operativas"
+        validation_rules: ["not_empty", "functionality_terms"]
+        
+      - field_key: "presentacion_componentes"
+        field_name: "PRESENTACIÓN DEL PRODUCTO/ COMPONENTES"
+        field_type: "textarea"
+        required: true
+        max_length: 600
+        placeholder: "Presentación comercial y componentes incluidos"
+        validation_rules: ["not_empty", "components_format"]
+        
+      - field_key: "composicion_caracteristicas"
+        field_name: "COMPOSICIÓN /CARACTERÍSTICAS FÍSICAS / MAT EN QUE ESTÁ FABRICADO/MEDIDAS/"
+        field_type: "textarea"
+        required: true
+        max_length: 1000
+        placeholder: "Material, dimensiones, peso, características físicas"
+        validation_rules: ["not_empty", "physical_characteristics"]
+        
+      - field_key: "color"
+        field_name: "COLOR"
+        field_type: "text"
+        required: false
+        max_length: 100
+        placeholder: "Color(es) disponible(s)"
+        validation_rules: ["color_format"]
+        
+      - field_key: "mayores_especificaciones"
+        field_name: "MAYORES ESPECIFICACIONES"
+        field_type: "textarea"
+        required: false
+        max_length: 1200
+        placeholder: "Especificaciones adicionales, certificaciones, normas"
+        validation_rules: ["specifications_format"]
+
+# Validaciones personalizadas por tipo
+validation_patterns:
+  technical_terms: ".*(?:técnic|especificación|norma|calidad).*"
+  presentation_format: ".*(?:unidad|kg|litro|pieza|caja|bolsa).*"
+  dimensions_format: ".*(?:cm|mm|m|pulgada|kg|gr|litro).*"
+  service_technical_terms: ".*(?:servicio|proceso|metodología|procedimiento).*"
+  components_list: ".*(?:componente|elemento|parte|módulo).*"
+  accessories_format: ".*(?:personal|material|equipo|software|recurso).*"
+  functionality_terms: ".*(?:función|capacidad|rendimiento|operación).*"
+  components_format: ".*(?:incluye|componente|accesorio|elemento).*"
+  physical_characteristics: ".*(?:material|dimensión|peso|tamaño|medida).*"
+  color_format: "^[a-zA-ZáéíóúñÑ\\s,/-]+$"
+  specifications_format: ".*(?:certificación|norma|estándar|requisito).*"

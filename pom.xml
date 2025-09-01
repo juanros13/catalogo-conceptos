@@ -22,6 +22,7 @@
 		<module>auth-service</module>
 		<module>technical-concept-service</module>
 		<module>validation-service</module>
+		<module>concept-management-service</module>
 	</modules>
 	<url/>
 	<licenses>
