@@ -17,10 +17,11 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/actuator/**").permitAll()
                         .pathMatchers("/public/**").permitAll()
-                        .anyExchange().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwkSetUri("{jwk-set-uri}"))
+                        .pathMatchers("/auth/login").permitAll()
+                        .pathMatchers("/auth/register").permitAll()
+                        .pathMatchers("/auth/validate").permitAll()
+                        .pathMatchers("/concepts/**").permitAll()
+                        .anyExchange().permitAll()
                 )
                 .build();
     }

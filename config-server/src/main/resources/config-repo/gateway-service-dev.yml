@@ -11,7 +11,8 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
   instance:
-    prefer-ip-address: true
+    prefer-ip-address: false
+    hostname: localhost
     lease-renewal-interval-in-seconds: 10
     lease-expiration-duration-in-seconds: 30
 
@@ -54,8 +55,8 @@ spring:
       resourceserver:
         jwt:
           # Configuración para Keycloak nucleo.rocks en desarrollo
-          issuer-uri: ${keycloak.auth-server-url}realms/${keycloak.realm}
-          jwk-set-uri: ${keycloak.auth-server-url}realms/${keycloak.realm}/protocol/openid-connect/certs
+          issuer-uri: https://auth.nucleo.rocks/realms/nucleo-dash-realm
+          jwk-set-uri: https://auth.nucleo.rocks/realms/nucleo-dash-realm/protocol/openid-connect/certs
 
 # Actuator endpoints para desarrollo
 management:

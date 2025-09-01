@@ -14,12 +14,12 @@ public class GatewayConfig {
                 // Auth Service Route
                 .route("auth-service-route", r -> r
                         .path("/auth/**")
-                        .filters(f -> f.stripPrefix(1))
                         .uri("lb://auth-service"))
                 
                 // Technical Concept Service Route
                 .route("technical-concept-service-route", r -> r
-                        .path("/api/general-concepts/**")
+                        .path("/concepts/**")
+                        .filters(f -> f.stripPrefix(1))
                         .uri("lb://technical-concept-service"))
                 
                 // Generic API Route (fallback to auth service)
