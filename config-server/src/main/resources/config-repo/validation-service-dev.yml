@@ -1,0 +1,127 @@
+# Validation Service - Configuración de Desarrollo
+server:
+  port: 8085
+
+spring:
+  application:
+    name: validation-service
+  
+  # PostgreSQL Development - Base de datos compartida con technical-concept-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/acceso_tabasco_dev}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:activo}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 10000
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000
+      max-lifetime: 600000
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate  # Solo valida el esquema, no lo modifica
+    show-sql: false      # Menos verbose para service de validación
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: America/Mexico_City
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:https://auth.nucleo.rocks/realms/nucleo-dash-realm}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:https://auth.nucleo.rocks/realms/nucleo-dash-realm/protocol/openid-connect/certs}
+
+# Eureka Client - Development
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 10
+  instance:
+    prefer-ip-address: false
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+# Configuración específica de Validation Service
+cubs:
+  validation:
+    # Configuración de validadores
+    uniqueness:
+      enabled: true
+      case-sensitive: false
+      check-deleted-concepts: false
+    area-chapter:
+      enabled: true
+      strict-validation: true
+      allowed-combinations-file: "classpath:area-chapter-combinations.yml"
+    format:
+      enabled: true
+      max-name-length: 255
+      max-description-length: 2000
+      max-specifications-length: 5000
+      allowed-unit-measures: ["PIEZA", "METRO", "KILOGRAMO", "LITRO", "SERVICIO", "LOTE", "M2", "M3"]
+    business-rules:
+      enabled: true
+      require-specifications: true
+      validate-technical-words: true
+    # Configuración de auditoría
+    audit:
+      enabled: true
+      log-all-validations: true
+      retention-days: 90
+    # Configuración de cache
+    cache:
+      enabled: true
+      ttl-minutes: 30
+      max-entries: 1000
+
+# Feign Client Configuration (para comunicarse con technical-concept-service)
+feign:
+  client:
+    config:
+      technical-concept-service:
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: basic
+
+# Actuator - Development (endpoints de validación específicos)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,validation-stats,cache-stats
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+    validation-stats:
+      enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+# Logging - Development
+logging:
+  level:
+    saf.cgmaig.validation: DEBUG
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+    org.springframework.cloud.config: INFO
+    feign: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
