@@ -320,11 +320,13 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ### Gateway (Puerto 8080)
 ```http
-GET    /actuator/health         # Health check del gateway
-POST   /auth/login              # Login de usuarios
-GET    /auth/profile            # Perfil del usuario autenticado
-GET    /concepts/**             # Proxy hacia Technical Concept Service
-POST   /concepts/**             # Proxy hacia Technical Concept Service
+GET    /actuator/health                    # Health check del gateway
+POST   /auth/login                         # Login de usuarios
+GET    /auth/profile                       # Perfil del usuario autenticado
+GET    /concepts/**                        # Proxy hacia Technical Concept Service
+POST   /concepts/**                        # Proxy hacia Technical Concept Service
+GET    /validation/**                      # Proxy hacia Validation Service
+POST   /validation/**                      # Proxy hacia Validation Service
 ```
 
 ### Technical Concept Service (Puerto 8083)
@@ -336,6 +338,17 @@ PUT    /api/concepts/{id}               # Actualizar concepto técnico
 DELETE /api/concepts/{id}               # Eliminar concepto técnico
 GET    /api/concepts/by-area/{area}     # Filtrar conceptos por área
 GET    /api/concepts/validate           # Validar concepto técnico
+```
+
+### Validation Service (Puerto 8085)
+```http
+GET    /api/validation/health           # Health check del validation service
+POST   /api/validation/concept          # Validación completa de concepto técnico
+POST   /api/validation/uniqueness       # Validación de unicidad por área
+POST   /api/validation/area-chapter     # Validación de relación área-capítulo
+POST   /api/validation/format           # Validación de formatos y especificaciones
+GET    /api/validation/rules            # Obtener reglas de validación activas
+GET    /api/validation/rules/{type}     # Obtener reglas por tipo de validación
 ```
 
 ### Auth Service (Puerto 8081)  

@@ -22,6 +22,12 @@ public class GatewayConfig {
                         .filters(f -> f.stripPrefix(1))
                         .uri("lb://technical-concept-service"))
                 
+                // Validation Service Route
+                .route("validation-service-route", r -> r
+                        .path("/validation/**")
+                        .filters(f -> f.stripPrefix(1))
+                        .uri("lb://validation-service"))
+                
                 // Generic API Route (fallback to auth service)
                 .route("api-service-route", r -> r
                         .path("/api/**")

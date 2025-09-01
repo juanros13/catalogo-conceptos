@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .pathMatchers("/auth/logout").authenticated() 
                         .pathMatchers("/auth/validate-token").authenticated()
                         .pathMatchers("/concepts/**").authenticated()
+                        .pathMatchers("/validation/**").authenticated()
                         
                         // Cualquier otro endpoint requiere autenticación
                         .anyExchange().authenticated()

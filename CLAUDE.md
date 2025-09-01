@@ -25,12 +25,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Load balancing and circuit breaking
 
 4. **auth-service** (Port 8081) - Authentication Service
-   - CURP-based authentication
-   - Keycloak integration
-   - Government employee payroll validation
+   - Keycloak integration for authentication
    - JWT token generation and validation
+   - User authentication and authorization
+   - Profile management endpoints
 
-5. **user-management-service** (Port 8082) - User Management Service
+5. **technical-concept-service** (Port 8083) - Technical Concept Management
+   - CUBS technical concept CRUD operations
+   - Area and chapter-based organization
+   - Role-based access control by area
+   - Audit trail for all changes
+
+6. **validation-service** (Port 8085) - Business Rules Validation
+   - Concept uniqueness validation by area
+   - Area-chapter relationship validation
+   - Format and specification validation
+   - Comprehensive business rules engine
+
+7. **user-management-service** (Port 8082) - User Management Service
    - Complete user lifecycle management
    - Role and permission administration
    - Organizational hierarchy management
@@ -77,6 +89,8 @@ cd config-server && ../mvnw spring-boot:run
 # 3. Start other services in any order
 cd gateway-service && ../mvnw spring-boot:run
 cd auth-service && ../mvnw spring-boot:run
+cd technical-concept-service && ../mvnw spring-boot:run
+cd validation-service && ../mvnw spring-boot:run
 cd user-management-service && ../mvnw spring-boot:run
 ```
 
