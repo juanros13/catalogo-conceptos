@@ -1,99 +1,99 @@
-# Sistema de Acceso Unificado - Gobierno de Tabasco
+# Catálogo de Conceptos Técnicos - Gobierno de Tabasco
 
-Sistema integral de gestión de accesos para plataformas internas del Gobierno de Tabasco, basado en arquitectura de microservicios con Spring Boot y autenticación centralizada mediante Keycloak.
+Sistema integral de gestión de conceptos técnicos para el CUBS (Catálogo Único de Bienes y Servicios) del Gobierno de Tabasco, basado en arquitectura de microservicios con Spring Boot y autenticación centralizada mediante Keycloak.
 
 ## 🎯 Objetivo del Proyecto
 
-Crear una **llave maestra** que permita a los empleados del Gobierno de Tabasco acceder de forma unificada a múltiples sistemas internos mediante un proceso de autenticación centralizado y validación de nómina activa.
+Crear un **sistema centralizado** que permita a los empleados del Gobierno de Tabasco gestionar y validar conceptos técnicos del CUBS mediante un proceso de autenticación seguro y control de acceso por áreas de trabajo.
 
 ## 🏛️ Contexto Gubernamental
 
-**Cliente**: Gobierno de Tabasco  
-**Propósito**: Sistema de Single Sign-On (SSO) para empleados gubernamentales  
-**Alcance**: Acceso unificado a plataformas internas del gobierno  
+**Cliente**: Gobierno de Tabasco - CGMAIG  
+**Propósito**: Sistema de gestión de conceptos técnicos para el CUBS  
+**Alcance**: Validación y control de conceptos técnicos por área de trabajo  
 
-### Servicios Gestionados
-- 📧 **Correo Electrónico Corporativo**
-- 💻 **Repositorio de Código (GitLab/GitHub Enterprise)**
-- 🏢 **Salas Virtuales (Teams/Zoom)**
-- 📄 **Sistema de Cartas Responsivas**
-- 🔐 **Otros sistemas internos según necesidad**
+### Funcionalidades Principales
+- 📋 **Gestión de Conceptos Técnicos**
+- 🔍 **Validación Técnica por Área**
+- 👥 **Control de Acceso por Roles**
+- 📊 **Reportes y Auditoría**
+- 🔐 **Autenticación con Keycloak**
 
 ## 🏗️ Arquitectura de Microservicios
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Sistema Acceso Tabasco                  │
+│              Catálogo de Conceptos Técnicos - CUBS         │
 ├─────────────────────────────────────────────────────────────┤
-│  🌐 API Gateway (Spring Cloud Gateway)                     │
+│  🌐 API Gateway (Spring Cloud Gateway + JWT)               │
 │  📋 Config Server (Spring Cloud Config)                    │
-│  📍 Service Discovery (Eureka/Consul)                      │
+│  📍 Service Discovery (Eureka Server)                      │
 ├─────────────────────────────────────────────────────────────┤
-│  🔐 Auth Service (Keycloak + Validación Nómina)           │
-│  👥 User Management Service (CURP, Nombres, Status)       │
-│  📝 Request Management Service (Solicitudes y Aprobaciones)│
-│  📧 Email Service Integration                               │
-│  💻 Repository Service Integration                          │
-│  🏢 Virtual Meeting Service Integration                     │
-│  📄 Document Management Service (Cartas Responsivas)       │
+│  🔐 Auth Service (Keycloak Integration)                    │
+│  📋 Technical Concept Service (CUBS Management)            │
+│  👥 User Management Service (Roles y Permisos)            │
+│  📊 Reporting Service (Auditoría y Métricas)              │
+│  🔍 Validation Service (Verificación Técnica)             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## 🔄 Flujo de Autenticación y Autorización
 
-### 1. Proceso de Login
+### 1. Proceso de Autenticación
 ```mermaid
 sequenceDiagram
     participant U as Usuario
     participant G as Gateway
     participant K as Keycloak
     participant A as Auth Service
-    participant N as Nómina DB
+    participant T as Technical Concept Service
     
     U->>G: Credenciales de login
     G->>K: Validar credenciales
-    K->>A: Token JWT válido
-    A->>N: Verificar CURP en nómina activa
-    N->>A: Usuario activo: true/false
-    A->>G: Token + permisos
-    G->>U: Acceso autorizado
+    K->>G: Token JWT válido
+    G->>A: Validar permisos por área
+    A->>T: Acceso autorizado con rol
+    T->>U: Dashboard de conceptos técnicos
 ```
 
-### 2. Proceso de Solicitud de Servicios
+### 2. Proceso de Gestión de Conceptos
 ```mermaid
 sequenceDiagram
-    participant U as Usuario
-    participant R as Request Service
-    participant D as Document Service
-    participant A as Approver
-    participant S as Service Integration
+    participant U as Validador
+    participant T as Technical Service
+    participant V as Validation Service
+    participant A as Audit Service
     
-    U->>R: Solicitar acceso a servicio
-    U->>D: Subir carta responsiva
-    R->>A: Notificar solicitud pendiente
-    A->>R: Aprobar/Rechazar solicitud
-    R->>S: Crear cuenta en servicio externo
-    S->>U: Credenciales de acceso
+    U->>T: Crear/Editar concepto técnico
+    T->>V: Validar reglas de negocio
+    V->>T: Validación exitosa
+    T->>A: Registrar cambios en auditoría
+    A->>U: Concepto guardado y auditado
 ```
 
-## 📋 Base de Datos - Vista de Usuarios
+## 📋 Base de Datos - Modelo de Conceptos Técnicos
 
-### Estructura de la Vista `vw_empleados_nomina`
+### Estructura Principal
 ```sql
-CREATE VIEW vw_empleados_nomina AS
-SELECT 
-    curp VARCHAR(18) PRIMARY KEY,
-    nombres VARCHAR(100) NOT NULL,
-    apellido_paterno VARCHAR(50),
-    apellido_materno VARCHAR(50),
-    email VARCHAR(100),
-    dependencia VARCHAR(100),
-    puesto VARCHAR(100),
-    status_nomina ENUM('ACTIVO', 'INACTIVO', 'SUSPENDIDO') DEFAULT 'ACTIVO',
-    fecha_ingreso DATE,
-    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-FROM empleados_nomina 
-WHERE status_nomina = 'ACTIVO';
+CREATE TABLE technical_concepts (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    area VARCHAR(100) NOT NULL,
+    chapter VARCHAR(100) NOT NULL,
+    unit_measure VARCHAR(50),
+    specifications TEXT,
+    status ENUM('ACTIVO', 'INACTIVO') DEFAULT 'ACTIVO',
+    created_by VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(100),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    UNIQUE KEY unique_name_area (name, area),
+    INDEX idx_area_chapter (area, chapter),
+    INDEX idx_status (status),
+    INDEX idx_created_by (created_by)
+);
 ```
 
 ## 🚀 Componentes del Sistema
@@ -115,92 +115,94 @@ WHERE status_nomina = 'ACTIVO';
 
 ### 🔐 Authentication Service
 - **Puerto**: 8081
-- **Responsabilidad**: Validación de usuarios en nómina, integración con Keycloak
-- **Base de datos**: MySQL/PostgreSQL
+- **Responsabilidad**: Integración con Keycloak, validación de tokens JWT
+- **Base de datos**: PostgreSQL
 
-### 👥 User Management Service  
-- **Puerto**: 8082
-- **Responsabilidad**: Gestión de perfiles de usuario, CURP, datos personales
+### 📋 Technical Concept Service  
+- **Puerto**: 8083
+- **Responsabilidad**: Gestión completa de conceptos técnicos del CUBS
 - **Funcionalidades**:
-  - Consulta de datos de nómina
-  - Actualización de perfiles
-  - Gestión de roles y permisos
+  - CRUD de conceptos técnicos
+  - Validación por área y capítulo
+  - Control de acceso por roles
+  - Auditoría de cambios
+  - APIs RESTful con paginación
 
-### 📝 Request Management Service
-- **Puerto**: 8083  
-- **Responsabilidad**: Gestión de solicitudes de acceso a servicios
+### 👥 User Management Service
+- **Puerto**: 8082  
+- **Responsabilidad**: Gestión de usuarios y roles del sistema
 - **Funcionalidades**:
-  - Crear solicitudes
-  - Workflow de aprobaciones
-  - Notificaciones a supervisores
-  - Historial de solicitudes
+  - Perfiles de usuario
+  - Asignación de roles por área
+  - Control de permisos
+  - Integración con Keycloak
 
-### 📄 Document Service
+### 📊 Reporting Service
 - **Puerto**: 8084
-- **Responsabilidad**: Gestión de cartas responsivas y documentos
+- **Responsabilidad**: Generación de reportes y métricas del CUBS
 - **Funcionalidades**:
-  - Upload de documentos PDF
-  - Validación de formatos
-  - Almacenamiento seguro
-  - Versionado de documentos
+  - Reportes de conceptos por área
+  - Estadísticas de validación
+  - Dashboard de métricas
+  - Exportación en múltiples formatos
 
-### 🔌 Integration Services
+### 🔍 Validation Service
+- **Puerto**: 8085
+- **Responsabilidad**: Validación técnica y reglas de negocio
+- **Funcionalidades**:
+  - Validación de unicidad por área
+  - Verificación de relación área-capítulo
+  - Control de formatos y especificaciones
+  - Auditoría de validaciones
 
-#### 📧 Email Service (8085)
-- Integración con Exchange/Office 365
-- Creación automática de cuentas de correo
-- Asignación a grupos de distribución
-
-#### 💻 Repository Service (8086)  
-- Integración con GitLab/GitHub Enterprise
-- Creación de usuarios y asignación de proyectos
-- Gestión de permisos por dependencia
-
-#### 🏢 Virtual Meeting Service (8087)
-- Integración con Microsoft Teams/Zoom
-- Creación de cuentas corporativas
-- Asignación de licencias según perfil
+### 📡 Notification Service
+- **Puerto**: 8086  
+- **Responsabilidad**: Gestión de notificaciones del sistema
+- **Funcionalidades**:
+  - Notificaciones de cambios
+  - Alertas de validación
+  - Comunicación por email
+  - Logs de actividad
 
 ## ⚙️ Configuración de Keycloak
 
-### Realm: `gobierno-tabasco`
+### Realm: `nucleo-dash-realm`
 ```yaml
 Realm Settings:
-  - Realm Name: gobierno-tabasco
-  - Display Name: "Sistema Gobierno Tabasco"
-  - Login Theme: gobierno-tabasco-theme
-  - Email Settings: SMTP del gobierno
+  - Realm Name: nucleo-dash-realm
+  - Display Name: "CUBS - Catálogo Conceptos Técnicos"
+  - Login Theme: nucleo-dash-theme
+  - Token Settings: JWT válidos por 5 minutos
   
 Clients:
-  - gateway-client: Confidential client para API Gateway
-  - web-app: Public client para aplicaciones web
-  - mobile-app: Public client para apps móviles
+  - nucleo-dash-back-client: Confidential client para API Gateway
+  - nucleo-dash-web-client: Public client para frontend
+  - technical-concept-client: Client específico para conceptos técnicos
   
 User Federation:
   - LDAP: Integración con Active Directory gubernamental
-  - Database: Vista de empleados de nómina
+  - Database: Vista de empleados activos
   
 Identity Providers:
-  - SAML: Para integración con sistemas federales
-  - Social: Google Workspace gubernamental
+  - SAML: Integración con sistemas federales
+  - OAuth2: Integración con nucleo.rocks
 ```
 
 ### Roles y Permisos
 ```yaml
 Realm Roles:
-  - empleado-gobierno: Rol base para todos los empleados
-  - supervisor: Puede aprobar solicitudes
-  - admin-ti: Administrador de TI
-  - secretario: Acceso a sistemas de alta seguridad
+  - VALIDADOR_TECNICO_CGMAIG: Validador técnico de CGMAIG
+  - CONSULTOR_CUBS: Consulta conceptos técnicos
+  - ADMIN_SISTEMA: Administrador del sistema
+  - AUDITOR: Acceso de solo lectura para auditoría
   
-Client Roles (por servicio):
-  email-service:
-    - email-user: Usuario básico de correo
-    - email-admin: Administrador de correo
-  
-  repository-service:
-    - repo-developer: Desarrollador
-    - repo-maintainer: Mantenedor de proyectos
+Client Roles (por área):
+  technical-concept-service:
+    - CONCEPT_CREATE: Crear conceptos técnicos
+    - CONCEPT_READ: Leer conceptos técnicos
+    - CONCEPT_UPDATE: Actualizar conceptos técnicos
+    - CONCEPT_DELETE: Eliminar conceptos técnicos
+    - CONCEPT_VALIDATE: Validar conceptos técnicos
 ```
 
 ## 🛠️ Instalación y Configuración
@@ -220,15 +222,15 @@ Client Roles (por servicio):
 ```bash
 # Database
 export DB_HOST=localhost
-export DB_PORT=3306
-export DB_NAME=acceso_tabasco
-export DB_USER=admin_acceso
-export DB_PASSWORD=secure_password
+export DB_PORT=5432
+export DB_NAME=acceso_tabasco_dev
+export DB_USER=postgres
+export DB_PASSWORD=activo
 
 # Keycloak
-export KEYCLOAK_URL=https://auth.tabasco.gob.mx
-export KEYCLOAK_REALM=gobierno-tabasco
-export KEYCLOAK_CLIENT_SECRET=your-secret-key
+export KEYCLOAK_URL=https://auth.nucleo.rocks
+export KEYCLOAK_REALM=nucleo-dash-realm
+export KEYCLOAK_CLIENT_SECRET=od5xYtQfHjRM5VUvSvBZkmiHZfhKCRQW
 
 # Services
 export CONFIG_SERVER_URL=http://localhost:8888
@@ -239,13 +241,13 @@ export EUREKA_SERVER_URL=http://localhost:8761
 ```yaml
 version: '3.8'
 services:
-  mysql:
-    image: mysql:8.0
+  postgresql:
+    image: postgres:13
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: acceso_tabasco
+      POSTGRES_PASSWORD: activo
+      POSTGRES_DB: acceso_tabasco_dev
     ports:
-      - "3306:3306"
+      - "5432:5432"
   
   keycloak:
     image: quay.io/keycloak/keycloak:21.0
@@ -318,72 +320,83 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ### Gateway (Puerto 8080)
 ```http
-GET    /api/health              # Health check
+GET    /actuator/health         # Health check del gateway
 POST   /auth/login              # Login de usuarios
-GET    /api/user/profile        # Perfil del usuario
-POST   /api/services/request    # Solicitar acceso a servicio
-GET    /api/services/status     # Estado de solicitudes
+GET    /auth/profile            # Perfil del usuario autenticado
+GET    /concepts/**             # Proxy hacia Technical Concept Service
+POST   /concepts/**             # Proxy hacia Technical Concept Service
 ```
 
-### User Management (Puerto 8082)
+### Technical Concept Service (Puerto 8083)
 ```http
-GET    /users/by-curp/{curp}    # Buscar por CURP
-PUT    /users/profile           # Actualizar perfil
-GET    /users/nomina/status     # Verificar status en nómina
+GET    /api/concepts                    # Listar conceptos técnicos (paginado)
+POST   /api/concepts                    # Crear nuevo concepto técnico
+GET    /api/concepts/{id}               # Obtener concepto por ID
+PUT    /api/concepts/{id}               # Actualizar concepto técnico
+DELETE /api/concepts/{id}               # Eliminar concepto técnico
+GET    /api/concepts/by-area/{area}     # Filtrar conceptos por área
+GET    /api/concepts/validate           # Validar concepto técnico
 ```
 
-### Request Management (Puerto 8083)  
+### Auth Service (Puerto 8081)  
 ```http
-POST   /requests                # Crear solicitud
-GET    /requests/pending        # Solicitudes pendientes (supervisor)
-PUT    /requests/{id}/approve   # Aprobar solicitud
-PUT    /requests/{id}/reject    # Rechazar solicitud
+POST   /api/auth/login          # Autenticación con Keycloak
+GET    /api/auth/profile        # Información del usuario autenticado
+POST   /api/auth/logout         # Cerrar sesión
+GET    /api/auth/validate-token # Validar token JWT
 ```
 
 ## 🔒 Seguridad y Compliance
 
 ### Medidas de Seguridad
-- ✅ Autenticación multifactor obligatoria
+- ✅ Autenticación JWT con Keycloak
+- ✅ Validación dual (Gateway + Servicios)
 - ✅ Cifrado de datos en tránsito (TLS 1.3)
-- ✅ Cifrado de datos en reposo (AES-256)
-- ✅ Logs de auditoría completos
-- ✅ Rate limiting y protección DDoS
-- ✅ Validación de documentos oficiales
+- ✅ Control de acceso por roles y áreas
+- ✅ Logs de auditoría de cambios
+- ✅ Rate limiting en Gateway
+- ✅ Validación de reglas de negocio
 
 ### Compliance Gubernamental
 - 📋 Cumple con la Ley General de Protección de Datos Personales
-- 📋 Integrable con sistemas de transparencia
-- 📋 Auditorías automáticas de accesos
-- 📋 Retención de logs según normativa
+- 📋 Trazabilidad completa de cambios en conceptos técnicos
+- 📋 Auditorías automáticas de validaciones
+- 📋 Control de versiones y cambios
+- 📋 Reportes de cumplimiento CUBS
 
 ## 📊 Monitoreo y Observabilidad
 
 ### Métricas (Micrometer + Prometheus)
 - Tiempo de respuesta por servicio
 - Número de autenticaciones exitosas/fallidas  
-- Solicitudes pendientes por dependencia
-- Uso de servicios por empleado
+- Conceptos técnicos creados/modificados por día
+- Validaciones exitosas/fallidas por área
+- Distribución de conceptos por capítulo
 
 ### Logs Centralizados (ELK Stack)
-- Logs de autenticación
-- Logs de solicitudes de acceso
+- Logs de autenticación y autorización
+- Logs de operaciones CRUD en conceptos
+- Logs de validaciones técnicas
+- Logs de auditoría de cambios
 - Logs de errores por servicio
-- Logs de auditoría de accesos
 
 ### Alertas
 - Fallos de autenticación masivos
-- Servicios no disponibles
-- Solicitudes pendientes por más de 48h
+- Servicios Technical Concept no disponible
+- Validaciones fallidas recurrentes
 - Intentos de acceso no autorizados
+- Creación masiva de conceptos (posible anomalía)
 
 ## 📞 Soporte y Contacto
 
 **Equipo de Desarrollo**: Coordinación General de Modernización Administrativa e Innovación Gubernamental (CGMAIG)
 
-**Mesa de Ayuda TI**: `soporte-acceso@tabasco.gob.mx`
+**Mesa de Ayuda TI**: `soporte-cubs@tabasco.gob.mx`
 
 **Documentación Técnica**: Disponible en repositorio interno
 
+**Sistema Keycloak**: `https://auth.nucleo.rocks`
+
 ---
 
-*Este sistema está diseñado para fortalecer la seguridad y eficiencia en el acceso a sistemas del Gobierno de Tabasco, garantizando trazabilidad completa y cumplimiento normativo.*
+*Este sistema está diseñado para fortalecer la gestión de conceptos técnicos del CUBS en el Gobierno de Tabasco, garantizando validación técnica, trazabilidad completa y cumplimiento de las especificaciones gubernamentales.*
