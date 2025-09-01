@@ -21,6 +21,7 @@
 		<module>gateway-service</module>
 		<module>auth-service</module>
 		<module>technical-concept-service</module>
+		<module>validation-service</module>
 	</modules>
 	<url/>
 	<licenses>

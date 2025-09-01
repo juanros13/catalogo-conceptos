@@ -2,7 +2,6 @@ package saf.cgmaig.validation;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
@@ -25,7 +24,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * - Spring Cloud Config para configuración centralizada
  */
 @SpringBootApplication
-@EnableEurekaClient
 @EnableFeignClients
 public class ValidationServiceApplication {
 
