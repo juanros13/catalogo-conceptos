@@ -71,9 +71,8 @@ public class BudgetClassification {
     @Column(name = "actualizado_por", length = 100)
     private String actualizadoPor;
 
-    // Relación con conceptos hijos (lazy loading)
-    @OneToMany(mappedBy = "padreCodigo", fetch = FetchType.LAZY)
-    @OrderBy("codigo ASC")
+    // Relación con conceptos hijos - se maneja programáticamente para evitar problemas de tipos
+    @Transient
     private List<BudgetClassification> hijos = new ArrayList<>();
 
     // Constructor vacío
