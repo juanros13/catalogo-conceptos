@@ -194,13 +194,13 @@ public class ValidationService {
         // Copiar errores
         if (individualResult.getErrors() != null) {
             individualResult.getErrors().forEach(error -> 
-                mainResult.addError(error.field(), error.message(), error.code()));
+                mainResult.addError(error.getField(), error.getMessage(), error.getCode()));
         }
 
         // Copiar warnings
         if (individualResult.getWarnings() != null) {
             individualResult.getWarnings().forEach(warning -> 
-                mainResult.addWarning(warning.field(), warning.message(), warning.code()));
+                mainResult.addWarning(warning.getField(), warning.getMessage(), warning.getCode()));
         }
     }
 
@@ -273,7 +273,7 @@ public class ValidationService {
                 "enabled", uniquenessValidator.isEnabled(),
                 "config", uniquenessValidator.isEnabled() ? uniquenessValidator.getConfig() : "disabled"
             );
-            case BUSINESS_RULE_VALIDATION -> Map.of(
+            case BUSINESS_RULE_VALIDATION, BUSINESS_RULES_VALIDATION -> Map.of(
                 "type", "BUSINESS_RULE_VALIDATION",
                 "enabled", businessRuleValidator.isEnabled(),
                 "config", businessRuleValidator.isEnabled() ? businessRuleValidator.getConfig() : "disabled"

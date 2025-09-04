@@ -1,12 +1,12 @@
-# Validation Service - Configuración de Desarrollo
+# Concept Management Service - Configuración de Desarrollo
 server:
-  port: 8085
+  port: 8086
 
 spring:
   application:
-    name: validation-service
+    name: concept-management-service
   
-  # PostgreSQL Development - Base de datos compartida con technical-concept-service
+  # PostgreSQL Development - Base de datos compartida con validation-service y technical-concept-service
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/acceso_tabasco_dev}
     username: ${DB_USER:postgres}
@@ -21,8 +21,8 @@ spring:
   
   jpa:
     hibernate:
-      ddl-auto: validate  # Solo valida el esquema, no lo modifica
-    show-sql: false      # Menos verbose para service de validación
+      ddl-auto: update    # Crear tablas si no existen
+    show-sql: false       # Menos verbose para servicio de gestión
     open-in-view: false
     properties:
       hibernate:
@@ -53,51 +53,32 @@ eureka:
     lease-renewal-interval-in-seconds: 10
     lease-expiration-duration-in-seconds: 30
 
-# Configuración específica de Validation Service
+# Configuración específica de Concept Management Service
 cubs:
-  validation:
-    # Configuración de templates por capítulo
-    templates:
-      enabled: true
-      config-file: "classpath:config-repo/chapter-templates.yml"
-    # Configuración de validadores
-    uniqueness:
-      enabled: true
-      case-sensitive: false
-      check-deleted-concepts: false
-    area-chapter:
-      enabled: true
-      strict-validation: true
-      allowed-combinations-file: "classpath:area-chapter-combinations.yml"
-    format:
-      enabled: true
-      max-name-length: 255
-      max-description-length: 2000
-      max-specifications-length: 5000
-      allowed-unit-measures: ["PIEZA", "METRO", "KILOGRAMO", "LITRO", "SERVICIO", "LOTE", "M2", "M3"]
-    business-rules:
-      enabled: true
-      high-value-threshold: 100000.00
-      restricted-hours-enabled: false
-      work-start-hour: 8
-      work-end-hour: 18
-    # Configuración del servicio principal
-    service:
-      enabled: true
-      parallel-execution: false
-      stop-on-first-error: false
+  concept-management:
+    # Configuración de estados de conceptos
+    concept-status:
+      draft: "DRAFT"
+      submitted: "SUBMITTED"
+      approved: "APPROVED"
+      rejected: "REJECTED"
+    # Configuración de validación
+    validation:
+      auto-validate-on-submit: true
+      allow-submit-with-warnings: true
+      require-comments-on-rejection: true
     # Configuración de auditoría
     audit:
       enabled: true
-      log-all-validations: true
-      retention-days: 90
+      track-all-changes: true
+      retention-days: 365
     # Configuración de cache
     cache:
       enabled: true
-      ttl-minutes: 30
-      max-entries: 1000
+      ttl-minutes: 15
+      max-entries: 500
 
-# Feign Client Configuration (para comunicarse con technical-concept-service)
+# Feign Client Configuration (para comunicarse con technical-concept-service y validation-service)
 feign:
   client:
     config:
@@ -105,19 +86,23 @@ feign:
         connectTimeout: 5000
         readTimeout: 10000
         loggerLevel: basic
+      validation-service:
+        connectTimeout: 5000
+        readTimeout: 15000  # Mayor timeout para validaciones
+        loggerLevel: basic
 
-# Actuator - Development (endpoints de validación específicos)
+# Actuator - Development
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,validation-stats,cache-stats
+        include: health,info,metrics,concept-stats,cache-stats
   endpoint:
     health:
       show-details: always
       probes:
         enabled: true
-    validation-stats:
+    concept-stats:
       enabled: true
   health:
     livenessstate:
@@ -128,7 +113,7 @@ management:
 # Logging - Development
 logging:
   level:
-    saf.cgmaig.validation: DEBUG
+    saf.cgmaig.conceptmanagement: DEBUG
     org.springframework.security: INFO
     org.springframework.web: INFO
     org.springframework.cloud.config: INFO

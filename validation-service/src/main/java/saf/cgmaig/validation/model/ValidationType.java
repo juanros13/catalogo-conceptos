@@ -14,6 +14,11 @@ public enum ValidationType {
     FULL_VALIDATION("Validación completa de concepto técnico"),
     
     /**
+     * Validación completa - Alias para compatibilidad
+     */
+    COMPLETE_VALIDATION("Validación completa de concepto técnico"),
+    
+    /**
      * Validación de unicidad - Verifica que el nombre sea único por área
      */
     UNIQUENESS_VALIDATION("Validación de unicidad por área"),
@@ -32,6 +37,11 @@ public enum ValidationType {
      * Validación de reglas de negocio - Aplica reglas específicas del CUBS
      */
     BUSINESS_RULES_VALIDATION("Validación de reglas de negocio CUBS"),
+    
+    /**
+     * Validación de reglas de negocio - Alias para compatibilidad
+     */
+    BUSINESS_RULE_VALIDATION("Validación de reglas de negocio CUBS"),
     
     /**
      * Validación antes de actualización - Verifica cambios permitidos

@@ -6,9 +6,10 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>saf.cgmaig</groupId>
-        <artifactId>catalogo-conceptos</artifactId>
-        <version>1.0.0</version>
+        <groupId>saf.cgmaig.</groupId>
+        <artifactId>Acceso-tabasco</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>concept-management-service</artifactId>

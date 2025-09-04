@@ -1,0 +1,1110 @@
+{
+  "info": {
+    "name": "Sistema CUBS - Catálogo de Conceptos",
+    "description": "Colección completa de endpoints para el Sistema de Catálogo Único de Bienes y Servicios (CUBS) del Gobierno de Tabasco",
+    "version": "2.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "description": "URL base del Gateway Service"
+    },
+    {
+      "key": "auth_url",
+      "value": "http://localhost:8081",
+      "description": "URL directa del Auth Service"
+    },
+    {
+      "key": "validation_url",
+      "value": "http://localhost:8085",
+      "description": "URL directa del Validation Service"
+    },
+    {
+      "key": "concept_mgmt_url",
+      "value": "http://localhost:8086",
+      "description": "URL directa del Concept Management Service"
+    },
+    {
+      "key": "technical_concept_url",
+      "value": "http://localhost:8083",
+      "description": "URL directa del Technical Concept Service"
+    },
+    {
+      "key": "config_url",
+      "value": "http://localhost:8888",
+      "description": "URL del Config Server"
+    },
+    {
+      "key": "eureka_url",
+      "value": "http://localhost:8761",
+      "description": "URL del Discovery Service (Eureka)"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "description": "JWT Token obtenido del login"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "description": "Refresh Token para renovar JWT"
+    },
+    {
+      "key": "concept_id",
+      "value": "",
+      "description": "ID del concepto técnico para operaciones específicas"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "🔐 Autenticación",
+      "item": [
+        {
+          "name": "Login - Obtener JWT Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.accessToken) {",
+                  "        pm.collectionVariables.set('jwt_token', response.accessToken);",
+                  "        pm.collectionVariables.set('refresh_token', response.refreshToken);",
+                  "        console.log('✅ JWT Token guardado exitosamente');",
+                  "        console.log('Token expira en:', response.expiresIn, 'segundos');",
+                  "    }",
+                  "} else {",
+                  "    console.log('❌ Error en login:', pm.response.text());",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"curp\": \"juanros13@gmail.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{auth_url}}/auth/login",
+              "host": ["{{auth_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Autenticación con email y password para obtener JWT token"
+          }
+        },
+        {
+          "name": "Validar Token Actual",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{auth_url}}/auth/validate-token",
+              "host": ["{{auth_url}}"],
+              "path": ["auth", "validate-token"]
+            },
+            "description": "Valida si el JWT token actual es válido"
+          }
+        },
+        {
+          "name": "Obtener Perfil Usuario",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{auth_url}}/auth/profile",
+              "host": ["{{auth_url}}"],
+              "path": ["auth", "profile"]
+            },
+            "description": "Obtiene el perfil del usuario autenticado"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 Templates y Validación",
+      "item": [
+        {
+          "name": "Obtener Todos los Templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{validation_url}}/api/templates",
+              "host": ["{{validation_url}}"],
+              "path": ["api", "templates"]
+            },
+            "description": "Obtiene todos los templates de capítulos CUBS disponibles"
+          }
+        },
+        {
+          "name": "Template por Capítulo - MATERIALES",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{validation_url}}/api/templates/2000_MATERIALES",
+              "host": ["{{validation_url}}"],
+              "path": ["api", "templates", "2000_MATERIALES"]
+            },
+            "description": "Obtiene template específico para capítulo de materiales"
+          }
+        },
+        {
+          "name": "Template por Capítulo - SERVICIOS",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{validation_url}}/api/templates/2000_SERVICIOS",
+              "host": ["{{validation_url}}"],
+              "path": ["api", "templates", "2000_SERVICIOS"]
+            },
+            "description": "Obtiene template específico para capítulo de servicios"
+          }
+        },
+        {
+          "name": "Estructura de Template",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{validation_url}}/api/templates/2000_MATERIALES/structure",
+              "host": ["{{validation_url}}"],
+              "path": ["api", "templates", "2000_MATERIALES", "structure"]
+            },
+            "description": "Obtiene estructura completa del template para frontend"
+          }
+        },
+        {
+          "name": "Capítulos Disponibles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{validation_url}}/api/templates/chapters",
+              "host": ["{{validation_url}}"],
+              "path": ["api", "templates", "chapters"]
+            },
+            "description": "Lista todos los capítulos disponibles"
+          }
+        },
+        {
+          "name": "Reglas de Validación",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{validation_url}}/api/validation/rules",
+              "host": ["{{validation_url}}"],
+              "path": ["api", "validation", "rules"]
+            },
+            "description": "Obtiene todas las reglas de validación disponibles"
+          }
+        },
+        {
+          "name": "Validar Concepto Completo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Silla de Oficina Ergonómica\",\n  \"description\": \"Silla ejecutiva con respaldo alto y soporte lumbar\",\n  \"area\": \"CGMAIG\",\n  \"chapter\": \"2000_MATERIALES\",\n  \"unitMeasure\": \"PIEZA\",\n  \"estimatedValue\": 2500.00,\n  \"specifications\": {\n    \"general\": \"Mobiliario de oficina\",\n    \"especifica\": \"Silla ejecutiva ergonómica\",\n    \"presentacionProducto\": \"Unidad individual\",\n    \"composicionMateriales\": \"Metal, plástico, tela\",\n    \"caracteristicasFisicas\": \"Alto respaldo, brazos ajustables\",\n    \"color\": \"Negro\",\n    \"mayoresEspecificaciones\": \"Certificación ergonómica ISO\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{validation_url}}/api/validation/concept",
+              "host": ["{{validation_url}}"],
+              "path": ["api", "validation", "concept"]
+            },
+            "description": "Valida un concepto completo aplicando todas las reglas"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📝 Gestión de Conceptos",
+      "item": [
+        {
+          "name": "Health Check - Concept Management",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{concept_mgmt_url}}/api/area-concepts/health",
+              "host": ["{{concept_mgmt_url}}"],
+              "path": ["api", "area-concepts", "health"]
+            },
+            "description": "Verifica el estado del servicio de gestión de conceptos"
+          }
+        },
+        {
+          "name": "Conceptos Base por Área - CGMAIG",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{concept_mgmt_url}}/api/area-concepts/base-concepts/CGMAIG",
+              "host": ["{{concept_mgmt_url}}"],
+              "path": ["api", "area-concepts", "base-concepts", "CGMAIG"]
+            },
+            "description": "Obtiene conceptos técnicos base disponibles para el área CGMAIG"
+          }
+        },
+        {
+          "name": "Template por Capítulo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{concept_mgmt_url}}/api/area-concepts/templates/2000_MATERIALES",
+              "host": ["{{concept_mgmt_url}}"],
+              "path": ["api", "area-concepts", "templates", "2000_MATERIALES"]
+            },
+            "description": "Obtiene estructura de template por capítulo"
+          }
+        },
+        {
+          "name": "Crear Concepto Específico",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"area\": \"CGMAIG\",\n  \"baseConceptId\": 1,\n  \"chapterKey\": \"2000_MATERIALES\",\n  \"specificName\": \"Laptop Dell Inspiron 15 3000\",\n  \"unitMeasure\": \"PIEZA\",\n  \"estimatedValue\": 15000.00,\n  \"general\": \"Equipo de cómputo\",\n  \"especifica\": \"Laptop para uso administrativo\",\n  \"presentacionProducto\": \"Unidad individual en caja original\",\n  \"composicionMateriales\": \"Plástico ABS, metal, componentes electrónicos\",\n  \"descripcionTecnica\": \"Procesador Intel i5, 8GB RAM, 256GB SSD\",\n  \"caracteristicasFisicas\": \"15.6 pulgadas, peso 2.1kg, color negro\",\n  \"color\": \"Negro\",\n  \"mayoresEspecificaciones\": \"Windows 11 Pro, garantía 1 año, teclado en español\"\n}"
+            },
+            "url": {
+              "raw": "{{concept_mgmt_url}}/api/area-concepts",
+              "host": ["{{concept_mgmt_url}}"],
+              "path": ["api", "area-concepts"]
+            },
+            "description": "Crea un nuevo concepto específico para un área"
+          }
+        },
+        {
+          "name": "Conceptos por Área - CGMAIG",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{concept_mgmt_url}}/api/area-concepts/area/CGMAIG?page=0&size=10",
+              "host": ["{{concept_mgmt_url}}"],
+              "path": ["api", "area-concepts", "area", "CGMAIG"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Lista conceptos del área CGMAIG con paginación"
+          }
+        },
+        {
+          "name": "Enviar para Validación",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{concept_mgmt_url}}/api/area-concepts/1/submit",
+              "host": ["{{concept_mgmt_url}}"],
+              "path": ["api", "area-concepts", "1", "submit"]
+            },
+            "description": "Envía un concepto para validación técnica"
+          }
+        },
+        {
+          "name": "Aprobar Concepto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comments\": \"Concepto aprobado. Cumple con todos los requisitos técnicos.\"\n}"
+            },
+            "url": {
+              "raw": "{{concept_mgmt_url}}/api/area-concepts/1/approve",
+              "host": ["{{concept_mgmt_url}}"],
+              "path": ["api", "area-concepts", "1", "approve"]
+            },
+            "description": "Aprueba un concepto (solo validadores técnicos)"
+          }
+        },
+        {
+          "name": "Rechazar Concepto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comments\": \"Concepto rechazado. Faltan especificaciones técnicas detalladas.\"\n}"
+            },
+            "url": {
+              "raw": "{{concept_mgmt_url}}/api/area-concepts/1/reject",
+              "host": ["{{concept_mgmt_url}}"],
+              "path": ["api", "area-concepts", "1", "reject"]
+            },
+            "description": "Rechaza un concepto con comentarios obligatorios"
+          }
+        },
+        {
+          "name": "Conceptos Pendientes de Validación",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{concept_mgmt_url}}/api/area-concepts/pending-validation",
+              "host": ["{{concept_mgmt_url}}"],
+              "path": ["api", "area-concepts", "pending-validation"]
+            },
+            "description": "Lista todos los conceptos pendientes de validación por área"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏗️ Conceptos Técnicos Generales",
+      "item": [
+        {
+          "name": "Health Check - Technical Concepts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{technical_concept_url}}/actuator/health",
+              "host": ["{{technical_concept_url}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Verifica el estado del servicio de conceptos técnicos"
+          }
+        },
+        {
+          "name": "Obtener Conceptos Activos para Captura",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{technical_concept_url}}/api/general-concepts",
+              "host": ["{{technical_concept_url}}"],
+              "path": ["api", "general-concepts"]
+            },
+            "description": "Lista todos los conceptos técnicos activos disponibles para captura"
+          }
+        },
+        {
+          "name": "Conceptos por Capítulo - Materiales (2000)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{technical_concept_url}}/api/general-concepts?capitulo=2000",
+              "host": ["{{technical_concept_url}}"],
+              "path": ["api", "general-concepts"],
+              "query": [
+                {
+                  "key": "capitulo",
+                  "value": "2000"
+                }
+              ]
+            },
+            "description": "Obtiene conceptos técnicos del capítulo 2000 (Materiales)"
+          }
+        },
+        {
+          "name": "Conceptos por Capítulo - Servicios (3000)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{technical_concept_url}}/api/general-concepts?capitulo=3000",
+              "host": ["{{technical_concept_url}}"],
+              "path": ["api", "general-concepts"],
+              "query": [
+                {
+                  "key": "capitulo",
+                  "value": "3000"
+                }
+              ]
+            },
+            "description": "Obtiene conceptos técnicos del capítulo 3000 (Servicios)"
+          }
+        },
+        {
+          "name": "Obtener Concepto por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{technical_concept_url}}/api/general-concepts/{{concept_id}}",
+              "host": ["{{technical_concept_url}}"],
+              "path": ["api", "general-concepts", "{{concept_id}}"]
+            },
+            "description": "Obtiene un concepto técnico específico por su ID (UUID)"
+          }
+        },
+        {
+          "name": "Crear Concepto Técnico General",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Equipo de Cómputo Estándar\",\n  \"descripcion\": \"Equipo de cómputo para uso administrativo general\",\n  \"capitulo\": 2000,\n  \"partida\": 5151,\n  \"unidadMedida\": \"PIEZA\",\n  \"areaFacultada\": \"CGMAIG\",\n  \"valorReferencial\": 25000.00,\n  \"especificacionesTecnicas\": {\n    \"procesador\": \"Intel Core i5 o superior\",\n    \"memoria\": \"8GB RAM DDR4\",\n    \"almacenamiento\": \"256GB SSD\",\n    \"conectividad\": \"WiFi, Bluetooth, USB 3.0\",\n    \"sistema\": \"Windows 11 Pro\",\n    \"garantia\": \"1 año mínimo\"\n  },\n  \"observaciones\": \"Concepto base para equipos de cómputo administrativos\"\n}"
+            },
+            "url": {
+              "raw": "{{technical_concept_url}}/api/general-concepts",
+              "host": ["{{technical_concept_url}}"],
+              "path": ["api", "general-concepts"]
+            },
+            "description": "Crea un nuevo concepto técnico general (solo validadores técnicos)"
+          }
+        },
+        {
+          "name": "Actualizar Concepto Técnico",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Equipo de Cómputo Estándar - Actualizado\",\n  \"descripcion\": \"Equipo de cómputo para uso administrativo con especificaciones actualizadas\",\n  \"valorReferencial\": 28000.00,\n  \"especificacionesTecnicas\": {\n    \"procesador\": \"Intel Core i5 11va gen o AMD Ryzen 5\",\n    \"memoria\": \"16GB RAM DDR4\",\n    \"almacenamiento\": \"512GB SSD NVMe\",\n    \"conectividad\": \"WiFi 6, Bluetooth 5.0, USB 3.2\",\n    \"sistema\": \"Windows 11 Pro\",\n    \"garantia\": \"2 años\"\n  },\n  \"observaciones\": \"Concepto actualizado con mejores especificaciones\"\n}"
+            },
+            "url": {
+              "raw": "{{technical_concept_url}}/api/general-concepts/{{concept_id}}",
+              "host": ["{{technical_concept_url}}"],
+              "path": ["api", "general-concepts", "{{concept_id}}"]
+            },
+            "description": "Actualiza un concepto técnico existente"
+          }
+        },
+        {
+          "name": "Inactivar Concepto Técnico",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{technical_concept_url}}/api/general-concepts/{{concept_id}}?motivo=Especificaciones obsoletas",
+              "host": ["{{technical_concept_url}}"],
+              "path": ["api", "general-concepts", "{{concept_id}}"],
+              "query": [
+                {
+                  "key": "motivo",
+                  "value": "Especificaciones obsoletas"
+                }
+              ]
+            },
+            "description": "Inactiva un concepto técnico con motivo obligatorio"
+          }
+        },
+        {
+          "name": "Reactivar Concepto Técnico",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{technical_concept_url}}/api/general-concepts/{{concept_id}}/reactivate?motivo=Concepto actualizado y válido nuevamente",
+              "host": ["{{technical_concept_url}}"],
+              "path": ["api", "general-concepts", "{{concept_id}}", "reactivate"],
+              "query": [
+                {
+                  "key": "motivo",
+                  "value": "Concepto actualizado y válido nuevamente"
+                }
+              ]
+            },
+            "description": "Reactiva un concepto técnico previamente inactivado"
+          }
+        },
+        {
+          "name": "Búsqueda Avanzada de Conceptos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{technical_concept_url}}/api/general-concepts/search?capitulo=2000&areaFacultada=CGMAIG&estado=ACTIVO&searchTerm=equipo&page=0&size=10",
+              "host": ["{{technical_concept_url}}"],
+              "path": ["api", "general-concepts", "search"],
+              "query": [
+                {
+                  "key": "capitulo",
+                  "value": "2000"
+                },
+                {
+                  "key": "areaFacultada",
+                  "value": "CGMAIG"
+                },
+                {
+                  "key": "estado",
+                  "value": "ACTIVO"
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "equipo"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Búsqueda avanzada con filtros múltiples y paginación"
+          }
+        },
+        {
+          "name": "Conceptos de Mi Área",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{technical_concept_url}}/api/general-concepts/my-area?page=0&size=20",
+              "host": ["{{technical_concept_url}}"],
+              "path": ["api", "general-concepts", "my-area"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Lista conceptos técnicos del área del usuario autenticado"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🌐 Gateway (Rutas Unificadas)",
+      "item": [
+        {
+          "name": "Templates vía Gateway",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/validation/templates",
+              "host": ["{{base_url}}"],
+              "path": ["api", "validation", "templates"]
+            },
+            "description": "Acceso a templates a través del Gateway"
+          }
+        },
+        {
+          "name": "Validación vía Gateway",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Monitor LED 24 pulgadas\",\n  \"description\": \"Monitor para estación de trabajo\",\n  \"area\": \"CGMAIG\",\n  \"chapter\": \"2000_MATERIALES\",\n  \"unitMeasure\": \"PIEZA\",\n  \"estimatedValue\": 3500.00,\n  \"specifications\": {\n    \"general\": \"Equipo de cómputo\",\n    \"especifica\": \"Monitor LED Full HD\",\n    \"presentacionProducto\": \"Unidad individual\",\n    \"caracteristicasFisicas\": \"24 pulgadas, resolución 1920x1080\",\n    \"color\": \"Negro\",\n    \"mayoresEspecificaciones\": \"Conectores HDMI y VGA\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/validation/concept",
+              "host": ["{{base_url}}"],
+              "path": ["api", "validation", "concept"]
+            },
+            "description": "Validación de concepto a través del Gateway"
+          }
+        },
+        {
+          "name": "Conceptos vía Gateway",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/area-concepts/area/CGMAIG",
+              "host": ["{{base_url}}"],
+              "path": ["api", "area-concepts", "area", "CGMAIG"]
+            },
+            "description": "Lista conceptos a través del Gateway"
+          }
+        },
+        {
+          "name": "Conceptos Técnicos vía Gateway",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/general-concepts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "general-concepts"]
+            },
+            "description": "Lista conceptos técnicos generales a través del Gateway"
+          }
+        },
+        {
+          "name": "Crear Concepto Técnico vía Gateway",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Mobiliario de Oficina Estándar\",\n  \"descripcion\": \"Mobiliario básico para oficinas gubernamentales\",\n  \"capitulo\": 2000,\n  \"partida\": 5151,\n  \"unidadMedida\": \"LOTE\",\n  \"areaFacultada\": \"CGMAIG\",\n  \"valorReferencial\": 15000.00,\n  \"especificacionesTecnicas\": {\n    \"escritorio\": \"120x60cm MDF laminado\",\n    \"silla\": \"Ergonómica con respaldo medio\",\n    \"archivero\": \"3 gavetas con cerradura\",\n    \"acabados\": \"Laminado melamínico resistente\"\n  },\n  \"observaciones\": \"Conjunto básico de mobiliario por estación de trabajo\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/general-concepts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "general-concepts"]
+            },
+            "description": "Crea concepto técnico general a través del Gateway"
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚙️ Infraestructura y Monitoreo",
+      "item": [
+        {
+          "name": "Eureka Dashboard",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{eureka_url}}/",
+              "host": ["{{eureka_url}}"],
+              "path": [""]
+            },
+            "description": "Dashboard de Eureka para ver servicios registrados"
+          }
+        },
+        {
+          "name": "Config Server Health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{config_url}}/actuator/health",
+              "host": ["{{config_url}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Estado del Config Server"
+          }
+        },
+        {
+          "name": "Configuración - Validation Service",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{config_url}}/validation-service/dev",
+              "host": ["{{config_url}}"],
+              "path": ["validation-service", "dev"]
+            },
+            "description": "Configuración del Validation Service"
+          }
+        },
+        {
+          "name": "Configuración - Concept Management",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{config_url}}/concept-management-service/dev",
+              "host": ["{{config_url}}"],
+              "path": ["concept-management-service", "dev"]
+            },
+            "description": "Configuración del Concept Management Service"
+          }
+        },
+        {
+          "name": "Health - Auth Service",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{auth_url}}/actuator/health",
+              "host": ["{{auth_url}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Estado del Auth Service"
+          }
+        },
+        {
+          "name": "Health - Validation Service",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{validation_url}}/actuator/health",
+              "host": ["{{validation_url}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Estado del Validation Service"
+          }
+        },
+        {
+          "name": "Health - Concept Management",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{concept_mgmt_url}}/actuator/health",
+              "host": ["{{concept_mgmt_url}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Estado del Concept Management Service"
+          }
+        },
+        {
+          "name": "Health - Technical Concepts",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{technical_concept_url}}/actuator/health",
+              "host": ["{{technical_concept_url}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Estado del Technical Concept Service"
+          }
+        },
+        {
+          "name": "Gateway Health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/actuator/health",
+              "host": ["{{base_url}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Estado del Gateway Service"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧪 Casos de Prueba Específicos",
+      "item": [
+        {
+          "name": "Flujo Completo - Material de Oficina",
+          "item": [
+            {
+              "name": "1. Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const response = pm.response.json();",
+                      "    pm.collectionVariables.set('jwt_token', response.accessToken);",
+                      "    console.log('✅ Login exitoso');",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"curp\": \"juanros13@gmail.com\",\n  \"password\": \"123456\"\n}"
+                },
+                "url": {
+                  "raw": "{{auth_url}}/auth/login",
+                  "host": ["{{auth_url}}"],
+                  "path": ["auth", "login"]
+                }
+              }
+            },
+            {
+              "name": "2. Obtener Template MATERIALES",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{validation_url}}/api/templates/2000_MATERIALES",
+                  "host": ["{{validation_url}}"],
+                  "path": ["api", "templates", "2000_MATERIALES"]
+                }
+              }
+            },
+            {
+              "name": "3. Crear Concepto",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"area\": \"CGMAIG\",\n  \"baseConceptId\": 1,\n  \"chapterKey\": \"2000_MATERIALES\",\n  \"specificName\": \"Escritorio Ejecutivo L 160x120cm\",\n  \"unitMeasure\": \"PIEZA\",\n  \"estimatedValue\": 8500.00,\n  \"general\": \"Mobiliario de oficina\",\n  \"especifica\": \"Escritorio ejecutivo forma L\",\n  \"presentacionProducto\": \"Escritorio desarmado en caja\",\n  \"composicionMateriales\": \"MDF laminado, herrajes metálicos\",\n  \"descripcionTecnica\": \"Escritorio en L con cajones y organizadores\",\n  \"caracteristicasFisicas\": \"160x120x75cm, superficie lisa antirrayas\",\n  \"color\": \"Nogal\",\n  \"mayoresEspecificaciones\": \"Incluye cajonera móvil, organizador de cables\"\n}"
+                },
+                "url": {
+                  "raw": "{{concept_mgmt_url}}/api/area-concepts",
+                  "host": ["{{concept_mgmt_url}}"],
+                  "path": ["api", "area-concepts"]
+                }
+              }
+            },
+            {
+              "name": "4. Validar Concepto",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Escritorio Ejecutivo L 160x120cm\",\n  \"description\": \"Escritorio ejecutivo en forma de L para oficina\",\n  \"area\": \"CGMAIG\",\n  \"chapter\": \"2000_MATERIALES\",\n  \"unitMeasure\": \"PIEZA\",\n  \"estimatedValue\": 8500.00,\n  \"specifications\": {\n    \"general\": \"Mobiliario de oficina\",\n    \"especifica\": \"Escritorio ejecutivo forma L\",\n    \"presentacionProducto\": \"Escritorio desarmado en caja\",\n    \"composicionMateriales\": \"MDF laminado, herrajes metálicos\",\n    \"descripcionTecnica\": \"Escritorio en L con cajones y organizadores\",\n    \"caracteristicasFisicas\": \"160x120x75cm, superficie lisa antirrayas\",\n    \"color\": \"Nogal\",\n    \"mayoresEspecificaciones\": \"Incluye cajonera móvil, organizador de cables\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{validation_url}}/api/validation/concept",
+                  "host": ["{{validation_url}}"],
+                  "path": ["api", "validation", "concept"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

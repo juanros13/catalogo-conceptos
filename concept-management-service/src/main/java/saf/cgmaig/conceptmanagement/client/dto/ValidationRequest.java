@@ -196,7 +196,7 @@ public class ValidationRequest {
     }
 
     public void setComponentesServicio(String componentesServicio) {
-        this.componentesServicio = componente sServicio;
+        this.componentesServicio = componentesServicio;
     }
 
     public String getAccesoriosServicio() {
