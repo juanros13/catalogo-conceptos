@@ -23,6 +23,7 @@
 		<module>technical-concept-service</module>
 		<module>validation-service</module>
 		<module>concept-management-service</module>
+		<module>budget-classification-service</module>
 	</modules>
 	<url/>
 	<licenses>

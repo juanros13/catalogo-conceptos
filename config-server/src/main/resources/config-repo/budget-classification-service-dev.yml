@@ -1,0 +1,129 @@
+# Budget Classification Service - Configuración de Desarrollo
+server:
+  port: 8084
+
+spring:
+  application:
+    name: budget-classification-service
+  
+  # PostgreSQL Development - Base de datos compartida con otros servicios
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/acceso_tabasco_dev}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:activo}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 10000
+      maximum-pool-size: 15
+      minimum-idle: 3
+      idle-timeout: 300000
+      max-lifetime: 600000
+  
+  jpa:
+    hibernate:
+      ddl-auto: update    # Crear tablas si no existen
+    show-sql: false       # Menos verbose para mejor performance
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: America/Mexico_City
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:https://auth.nucleo.rocks/realms/nucleo-dash-realm}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:https://auth.nucleo.rocks/realms/nucleo-dash-realm/protocol/openid-connect/certs}
+
+  # Cache Configuration
+  cache:
+    type: simple
+    cache-names: budgetClassifications,hierarchies
+
+# Eureka Client - Development
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 10
+  instance:
+    prefer-ip-address: false
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+# Configuración específica de Budget Classification Service
+cubs:
+  budget-classification:
+    # Configuración de niveles jerárquicos
+    levels:
+      capitulo:
+        pattern: "X000"
+        description: "Capítulo - Nivel 1"
+        min-code: "1000"
+        max-code: "9000"
+      partida-generica:
+        pattern: "XX00"
+        description: "Partida Genérica - Nivel 2"
+      partida-especifica:
+        pattern: "XXX0"
+        description: "Partida Específica - Nivel 3"
+      partida:
+        pattern: "XXXX"
+        description: "Partida - Nivel 4"
+    
+    # Configuración de validaciones
+    validation:
+      enforce-hierarchy: true
+      allow-orphan-nodes: false
+      validate-parent-exists: true
+    
+    # Configuración de cache
+    cache:
+      ttl-minutes: 30
+      max-entries: 1000
+      enable-statistics: true
+    
+    # Configuración de auditoría
+    audit:
+      enabled: true
+      track-hierarchy-changes: true
+      retention-days: 365
+
+# Actuator - Development
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,configprops,cache
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+    cache:
+      enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+# Logging - Development
+logging:
+  level:
+    saf.cgmaig.budgetclassification: DEBUG
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+    org.springframework.cloud.config: INFO
+    org.springframework.cache: DEBUG
+    org.hibernate.SQL: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

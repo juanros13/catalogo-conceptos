@@ -32,6 +32,11 @@
       "description": "URL directa del Technical Concept Service"
     },
     {
+      "key": "budget_classification_url",
+      "value": "http://localhost:8084",
+      "description": "URL directa del Budget Classification Service"
+    },
+    {
       "key": "config_url",
       "value": "http://localhost:8888",
       "description": "URL del Config Server"
@@ -771,6 +776,318 @@
       ]
     },
     {
+      "name": "📊 Clasificación Presupuestaria",
+      "item": [
+        {
+          "name": "Health Check - Budget Classifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/health",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "health"]
+            },
+            "description": "Verifica el estado del servicio de clasificación presupuestaria"
+          }
+        },
+        {
+          "name": "Información del Servicio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/info",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "info"]
+            },
+            "description": "Información detallada del servicio y estructura jerárquica"
+          }
+        },
+        {
+          "name": "Obtener Todos los Capítulos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/capitulos",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "capitulos"]
+            },
+            "description": "Lista todos los capítulos (nivel raíz) - Códigos terminados en 000"
+          }
+        },
+        {
+          "name": "Clasificación por Código Específico",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/2111",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "2111"]
+            },
+            "description": "Obtiene información detallada de una clasificación específica"
+          }
+        },
+        {
+          "name": "Hijos Directos de un Código",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/2100/hijos",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "2100", "hijos"]
+            },
+            "description": "Obtiene todos los elementos hijos directos de una clasificación"
+          }
+        },
+        {
+          "name": "Jerarquía Completa desde Código",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/2000/jerarquia",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "2000", "jerarquia"]
+            },
+            "description": "Obtiene la estructura jerárquica completa desde un código específico"
+          }
+        },
+        {
+          "name": "Clasificaciones por Nivel - Capítulos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/nivel/CAPITULO?page=0&size=10",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "nivel", "CAPITULO"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Lista clasificaciones por nivel específico con paginación"
+          }
+        },
+        {
+          "name": "Clasificaciones por Nivel - Partidas Genéricas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/nivel/PARTIDA_GENERICA?page=0&size=20",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "nivel", "PARTIDA_GENERICA"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Lista todas las partidas genéricas (códigos terminados en 00)"
+          }
+        },
+        {
+          "name": "Búsqueda Avanzada con Filtros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/search?nivel=PARTIDA&padreCodigo=2110&activo=true&searchTerm=oficina&page=0&size=10",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "search"],
+              "query": [
+                {
+                  "key": "nivel",
+                  "value": "PARTIDA"
+                },
+                {
+                  "key": "padreCodigo",
+                  "value": "2110"
+                },
+                {
+                  "key": "activo",
+                  "value": "true"
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "oficina"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Búsqueda avanzada combinando múltiples filtros"
+          }
+        },
+        {
+          "name": "Búsqueda por Texto Libre",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/search/text?searchTerm=materiales",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "search", "text"],
+              "query": [
+                {
+                  "key": "searchTerm",
+                  "value": "materiales"
+                }
+              ]
+            },
+            "description": "Búsqueda por texto en nombres, descripciones y códigos"
+          }
+        },
+        {
+          "name": "Breadcrumb - Ruta Jerárquica",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/2111/breadcrumb",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "2111", "breadcrumb"]
+            },
+            "description": "Obtiene la ruta completa desde la raíz hasta el código especificado"
+          }
+        },
+        {
+          "name": "Crear Nueva Clasificación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"2114\",\n  \"nombre\": \"Material de archivo\",\n  \"descripcion\": \"Carpetas, folders y material de archivo y organización documental\",\n  \"orden\": 10\n}"
+            },
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications"]
+            },
+            "description": "Crear nueva clasificación presupuestaria (Solo administradores)"
+          }
+        },
+        {
+          "name": "Actualizar Clasificación",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Material de archivo y organización\",\n  \"descripcion\": \"Carpetas, folders y material para organización documental y administrativa\",\n  \"orden\": 15\n}"
+            },
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/2114",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "2114"]
+            },
+            "description": "Actualizar clasificación existente (Solo administradores)"
+          }
+        },
+        {
+          "name": "Activar/Inactivar Clasificación",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/2114/toggle-active?activo=false",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "2114", "toggle-active"],
+              "query": [
+                {
+                  "key": "activo",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "Cambiar estado activo/inactivo (Solo administradores)"
+          }
+        },
+        {
+          "name": "Verificar si se Puede Eliminar",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/2114/can-delete",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "2114", "can-delete"]
+            },
+            "description": "Verifica si una clasificación puede ser eliminada sin afectar integridad"
+          }
+        },
+        {
+          "name": "Estadísticas del Sistema",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{budget_classification_url}}/api/budget-classifications/statistics",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["api", "budget-classifications", "statistics"]
+            },
+            "description": "Obtiene estadísticas del sistema por nivel jerárquico"
+          }
+        }
+      ]
+    },
+    {
       "name": "🌐 Gateway (Rutas Unificadas)",
       "item": [
         {
@@ -878,6 +1195,32 @@
             },
             "description": "Crea concepto técnico general a través del Gateway"
           }
+        },
+        {
+          "name": "Clasificaciones Presupuestarias vía Gateway",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/budget-classifications/capitulos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "budget-classifications", "capitulos"]
+            },
+            "description": "Obtiene capítulos presupuestarios a través del Gateway"
+          }
+        },
+        {
+          "name": "Jerarquía Presupuestaria vía Gateway",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/budget-classifications/2000/jerarquia",
+              "host": ["{{base_url}}"],
+              "path": ["api", "budget-classifications", "2000", "jerarquia"]
+            },
+            "description": "Obtiene jerarquía presupuestaria completa a través del Gateway"
+          }
         }
       ]
     },
@@ -978,6 +1321,18 @@
               "path": ["actuator", "health"]
             },
             "description": "Estado del Technical Concept Service"
+          }
+        },
+        {
+          "name": "Health - Budget Classifications",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{budget_classification_url}}/actuator/health",
+              "host": ["{{budget_classification_url}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Estado del Budget Classification Service"
           }
         },
         {
