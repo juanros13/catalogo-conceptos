@@ -45,10 +45,20 @@ public interface BudgetClassificationRepository extends JpaRepository<BudgetClas
     @Query("SELECT COUNT(bc) FROM BudgetClassification bc WHERE bc.padreCodigo = :padreCodigo AND bc.activo = true")
     long countHijosActivos(@Param("padreCodigo") String padreCodigo);
 
-    // Obtener toda la jerarquía desde un nodo específico
-    @Query("SELECT bc FROM BudgetClassification bc WHERE " +
-           "(bc.codigo = :codigoRaiz OR bc.codigo LIKE CONCAT(:codigoRaiz, '%')) " +
-           "AND bc.activo = true ORDER BY bc.codigo ASC")
+    // Obtener toda la jerarquía desde un nodo específico usando recursión
+    @Query(value = "WITH RECURSIVE jerarquia AS ( " +
+           "  SELECT codigo, nombre, descripcion, nivel, padre_codigo, orden, activo, " +
+           "         fecha_creacion, fecha_actualizacion, creado_por, actualizado_por, id " +
+           "  FROM budget_classifications WHERE codigo = :codigoRaiz AND activo = true " +
+           "  UNION ALL " +
+           "  SELECT bc.codigo, bc.nombre, bc.descripcion, bc.nivel, bc.padre_codigo, bc.orden, bc.activo, " +
+           "         bc.fecha_creacion, bc.fecha_actualizacion, bc.creado_por, bc.actualizado_por, bc.id " +
+           "  FROM budget_classifications bc " +
+           "  INNER JOIN jerarquia j ON bc.padre_codigo = j.codigo " +
+           "  WHERE bc.activo = true " +
+           ") " +
+           "SELECT * FROM jerarquia ORDER BY codigo ASC", 
+           nativeQuery = true)
     List<BudgetClassification> findJerarquiaCompleta(@Param("codigoRaiz") String codigoRaiz);
 
     // Búsqueda por texto en nombre o descripción

@@ -140,6 +140,16 @@ public class BudgetClassificationService {
     }
 
     /**
+     * Cargar hijos para una entidad (método utilitario)
+     */
+    private void loadChildren(BudgetClassification entity) {
+        if (entity != null && entity.getCodigo() != null) {
+            List<BudgetClassification> hijos = repository.findByPadreCodigoAndActivoTrueOrderByOrdenAscCodigoAsc(entity.getCodigo());
+            entity.setHijos(hijos);
+        }
+    }
+
+    /**
      * Obtener jerarquía completa desde un código
      */
     @Cacheable(value = "hierarchies", key = "#codigoRaiz")
@@ -150,9 +160,17 @@ public class BudgetClassificationService {
         BudgetClassification raiz = findByCodigo(codigoRaiz);
         List<BudgetClassification> jerarquiaCompleta = repository.findJerarquiaCompleta(codigoRaiz);
         
+        logger.debug("Elementos encontrados en jerarquía completa: {}", jerarquiaCompleta.size());
+        if (jerarquiaCompleta.isEmpty()) {
+            logger.warn("No se encontraron elementos en la jerarquía para código: {}", codigoRaiz);
+        }
+        
         List<BudgetClassificationResponse> jerarquiaResponse = mapper.buildHierarchy(jerarquiaCompleta, codigoRaiz);
         
-        return new HierarchyResponse(codigoRaiz, raiz.getNombre(), jerarquiaResponse);
+        HierarchyResponse response = new HierarchyResponse(codigoRaiz, raiz.getNombre(), jerarquiaResponse);
+        logger.debug("Jerarquía construida con {} nodos raíz", jerarquiaResponse.size());
+        
+        return response;
     }
 
     /**
