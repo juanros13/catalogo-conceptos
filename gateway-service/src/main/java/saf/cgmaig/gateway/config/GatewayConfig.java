@@ -28,6 +28,12 @@ public class GatewayConfig {
                         .filters(f -> f.stripPrefix(1))
                         .uri("lb://validation-service"))
                 
+                // Budget Classification Service Route
+                .route("budget-classification-service-route", r -> r
+                        .path("/budget-classifications/**")
+                        .filters(f -> f.stripPrefix(1))
+                        .uri("lb://budget-classification-service"))
+                
                 // Generic API Route (fallback to auth service)
                 .route("api-service-route", r -> r
                         .path("/api/**")

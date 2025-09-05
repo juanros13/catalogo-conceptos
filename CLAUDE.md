@@ -36,13 +36,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Role-based access control by area
    - Audit trail for all changes
 
-6. **validation-service** (Port 8085) - Business Rules Validation
+6. **budget-classification-service** (Port 8084) - Budget Classification Management
+   - 4-level hierarchical budget classification system
+   - Capítulos → Partidas Genéricas → Partidas Específicas → Partidas
+   - Public consultation APIs and secure administrative endpoints
+   - Advanced caching and materialized views for performance
+   - Complete CUBS budget structure management
+
+7. **validation-service** (Port 8085) - Business Rules Validation
    - Concept uniqueness validation by area
    - Area-chapter relationship validation
    - Format and specification validation
    - Comprehensive business rules engine
 
-7. **user-management-service** (Port 8082) - User Management Service
+8. **user-management-service** (Port 8082) - User Management Service
    - Complete user lifecycle management
    - Role and permission administration
    - Organizational hierarchy management
@@ -90,6 +97,7 @@ cd config-server && ../mvnw spring-boot:run
 cd gateway-service && ../mvnw spring-boot:run
 cd auth-service && ../mvnw spring-boot:run
 cd technical-concept-service && ../mvnw spring-boot:run
+cd budget-classification-service && ../mvnw spring-boot:run
 cd validation-service && ../mvnw spring-boot:run
 cd user-management-service && ../mvnw spring-boot:run
 ```
@@ -153,6 +161,10 @@ The system validates against government payroll with these key fields:
 ### Gateway Routes (Port 8080)
 - `/auth/**` → auth-service (Port 8081)
 - `/users/**` → user-management-service (Port 8082)
+- `/concepts/**` → technical-concept-service (Port 8083)
+- `/budget-classifications/**` → budget-classification-service (Port 8084)
+- `/validation/**` → validation-service (Port 8085)
+- `/api/**` → Fallback to auth-service
 - `/actuator/**` → Service health endpoints
 
 ### Authentication API (Port 8081)
@@ -160,6 +172,16 @@ The system validates against government payroll with these key fields:
 - `POST /api/auth/validate` - Token validation
 - `GET /api/auth/profile` - User profile info
 - `POST /api/auth/refresh` - Token refresh
+
+### Budget Classification API (Port 8084)
+- `GET /api/budget-classifications/capitulos` - Get all chapters (public)
+- `GET /api/budget-classifications/{codigo}` - Get classification by code (public)
+- `GET /api/budget-classifications/{codigo}/hijos` - Get direct children (public)
+- `GET /api/budget-classifications/{codigo}/jerarquia` - Get complete hierarchy (public)
+- `GET /api/budget-classifications/search` - Advanced search (public)
+- `POST /api/budget-classifications` - Create classification (admin only)
+- `PUT /api/budget-classifications/{codigo}` - Update classification (admin only)
+- `GET /api/budget-classifications/statistics` - Get statistics (authenticated)
 
 ### User Management API (Port 8082)
 - `GET /api/users` - List users (paginated)
