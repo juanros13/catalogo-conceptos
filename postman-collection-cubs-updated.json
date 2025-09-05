@@ -1202,9 +1202,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/budget-classifications/capitulos",
+              "raw": "{{base_url}}/budget-classifications/api/budget-classifications/capitulos",
               "host": ["{{base_url}}"],
-              "path": ["api", "budget-classifications", "capitulos"]
+              "path": ["budget-classifications", "api", "budget-classifications", "capitulos"]
             },
             "description": "Obtiene capítulos presupuestarios a través del Gateway"
           }
@@ -1215,11 +1215,48 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/budget-classifications/2000/jerarquia",
+              "raw": "{{base_url}}/budget-classifications/api/budget-classifications/2000/jerarquia",
               "host": ["{{base_url}}"],
-              "path": ["api", "budget-classifications", "2000", "jerarquia"]
+              "path": ["budget-classifications", "api", "budget-classifications", "2000", "jerarquia"]
             },
             "description": "Obtiene jerarquía presupuestaria completa a través del Gateway"
+          }
+        },
+        {
+          "name": "Búsqueda Presupuestaria por Texto vía Gateway",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/budget-classifications/api/budget-classifications/search/text?searchTerm=oficina",
+              "host": ["{{base_url}}"],
+              "path": ["budget-classifications", "api", "budget-classifications", "search", "text"],
+              "query": [
+                {
+                  "key": "searchTerm",
+                  "value": "oficina"
+                }
+              ]
+            },
+            "description": "Búsqueda por texto en clasificaciones presupuestarias vía Gateway"
+          }
+        },
+        {
+          "name": "Estadísticas Presupuestarias vía Gateway",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/budget-classifications/api/budget-classifications/statistics",
+              "host": ["{{base_url}}"],
+              "path": ["budget-classifications", "api", "budget-classifications", "statistics"]
+            },
+            "description": "Obtiene estadísticas del sistema presupuestario vía Gateway (requiere autenticación)"
           }
         }
       ]
